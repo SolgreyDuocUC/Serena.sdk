@@ -4,12 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
-import com.duocuc.serena.ui.theme.SerenaTheme
-import com.duocuc.serena.ui.theme.ui.components.DashboardScreen
-import com.duocuc.serena.ui.theme.ui.components.HomeScreen
-import com.duocuc.serena.ui.theme.ui.components.LoginScreen
-import com.duocuc.serena.ui.theme.ui.components.RegisterScreen
-import com.duocuc.serena.ui.theme.ui.components.SplashScreen
+import com.duocuc.serena.ui.theme.theme.SerenaTheme
+import com.duocuc.serena.ui.theme.screens.DashboardScreen
+import com.duocuc.serena.ui.theme.screens.HomeScreen
+import com.duocuc.serena.ui.theme.screens.LoginScreen
+import com.duocuc.serena.ui.theme.screens.RegisterScreen
+import com.duocuc.serena.ui.theme.screens.SplashScreen
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {

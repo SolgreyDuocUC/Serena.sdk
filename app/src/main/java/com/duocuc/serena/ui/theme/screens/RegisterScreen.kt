@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.ui.components
+package com.duocuc.serena.ui.theme.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme
+package com.duocuc.serena.ui.theme.theme
 
 import androidx.compose.ui.graphics.Color
 

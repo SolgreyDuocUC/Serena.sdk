@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.ui.components
+package com.duocuc.serena.ui.theme.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -90,7 +90,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 🔹 Botón estilizado de Google
+                // Botón estilizado de Google
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
