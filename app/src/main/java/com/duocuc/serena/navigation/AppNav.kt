@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun AppNavHost (nav: NavHostController){
-
+/*
     val configVM: ConfigViewModel = viewModel()
     val perfilVM: PerfilViewModel = viewModel()
     val productoVM: ProductoViewModel = viewModel()
@@ -24,5 +24,6 @@ fun AppNavHost (nav: NavHostController){
             ResumenScreen(nav, productoVM)
         }
     }
+ */
 
 }
