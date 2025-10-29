@@ -45,9 +45,9 @@ fun LoginScreen(
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    painter = painterResource(id = R.mipmap.ic_google_launcher_foreground),
                     contentDescription = "Logo Serena",
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(80.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -77,7 +77,8 @@ fun LoginScreen(
                     onValueChange = { password = it },
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password) // Aseguramos el teclado de contraseña
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -106,7 +107,7 @@ fun LoginScreen(
                 ) {
                     Spacer(modifier = Modifier.width(12.dp))
                     Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+                        painter = painterResource(id = R.mipmap.ic_google_launcher_foreground),
                         contentDescription = "Google logo",
                         modifier = Modifier.size(24.dp)
                     )

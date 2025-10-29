@@ -1,6 +1,7 @@
 package com.duocuc.serena.ui.theme.screens
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,9 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.duocuc.serena.R
+
 
 @Composable
 fun HomeScreen() {
@@ -50,17 +55,17 @@ fun HomeScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)), // Fondo sólido
+            .background(Color(0xFFF5F5F5)),
         contentAlignment = Alignment.Center
     ) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // Agregar logo: Image(painter = painterResource(R.drawable.tu_imagen), contentDescription = null)
-            Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .background(Color.LightGray) // placeholder
+            // Imagen
+            Image(
+                painter = painterResource(R.drawable.ic_launcher_foreground),
+                contentDescription = "Logo de Serena",
+                modifier = Modifier.size(150.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -71,12 +76,15 @@ fun HomeScreen() {
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "Tu compañera de bienestar emocional",
                 color = Color.Gray,
                 fontSize = 20.sp
             )
+
             Spacer(modifier = Modifier.height(40.dp))
 
             // Puntitos animados
@@ -103,4 +111,5 @@ fun HomeScreen() {
         }
     }
 }
+
 
