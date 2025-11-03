@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -21,18 +20,13 @@ fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     registerViewModel: RegisterViewModel = viewModel()
 ) {
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
 
     val uiState by registerViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Efecto para manejar la navegación y los snackbars
     LaunchedEffect(key1 = uiState) {
-        if (uiState.registrationSuccess) {
+        if (uiState.registroExitoso) { // Nombre actualizado
             onRegisterSuccess()
         }
         uiState.error?.let {
@@ -49,7 +43,7 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            if (uiState.isLoading) {
+            if (uiState.estaCargando) { // Nombre actualizado
                 CircularProgressIndicator()
             } else {
                 Column(
@@ -61,8 +55,8 @@ fun RegisterScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
+                        value = uiState.nombreUsuario, // PASO 2: Valor viene del ViewModel
+                        onValueChange = { registerViewModel.onNombreUsuarioChange(it) }, // PASO 3: Notifica al ViewModel
                         label = { Text("Nombre de usuario") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -70,8 +64,8 @@ fun RegisterScreen(
                     )
 
                     OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
+                        value = uiState.correo,
+                        onValueChange = { registerViewModel.onCorreoChange(it) },
                         label = { Text("Correo electrónico") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true,
@@ -80,8 +74,8 @@ fun RegisterScreen(
                     )
 
                     OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        value = uiState.contrasena,
+                        onValueChange = { registerViewModel.onContrasenaChange(it) },
                         label = { Text("Contraseña") },
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -91,8 +85,8 @@ fun RegisterScreen(
                     )
 
                     OutlinedTextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
+                        value = uiState.confirmarContrasena,
+                        onValueChange = { registerViewModel.onConfirmarContrasenaChange(it) },
                         label = { Text("Confirmar contraseña") },
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -104,9 +98,7 @@ fun RegisterScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = {
-                            registerViewModel.register(username, email, password, confirmPassword)
-                        },
+                        onClick = { registerViewModel.registrar() }, // PASO 4: El ViewModel ya tiene los datos
                         modifier = Modifier.fillMaxWidth().height(50.dp)
                     ) {
                         Text("Registrarse")

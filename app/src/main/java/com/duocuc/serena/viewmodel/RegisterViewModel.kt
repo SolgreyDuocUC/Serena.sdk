@@ -8,46 +8,66 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.util.Patterns
 
-// Estado de la interfaz de usuario para la pantalla de registro.
-data class RegisterUiState(
-    val isLoading: Boolean = false,
-    val registrationSuccess: Boolean = false,
+// 1. EstadoRegistroUi CONTIENE TODO EL ESTADO DE LA PANTALLA
+data class EstadoRegistroUi(
+    // Estado de los campos del formulario
+    val nombreUsuario: String = "",
+    val correo: String = "",
+    val contrasena: String = "",
+    val confirmarContrasena: String = "",
+
+    // Estado de los eventos de la UI
+    val estaCargando: Boolean = false,
+    val registroExitoso: Boolean = false,
     val error: String? = null
 )
 
 class RegisterViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(RegisterUiState())
+    private val _uiState = MutableStateFlow(EstadoRegistroUi())
     val uiState = _uiState.asStateFlow()
 
-    fun register(username: String, email: String, password: String, confirmPassword: String) {
-        // Iniciar el estado de carga
-        _uiState.update { it.copy(isLoading = true, error = null) }
+    // 2. FUNCIONES PARA MANEJAR LOS CAMBIOS EN LA UI
+    fun onNombreUsuarioChange(nombreUsuario: String) {
+        _uiState.update { it.copy(nombreUsuario = nombreUsuario) }
+    }
 
-        // Validaciones
-        if (username.isBlank() || email.isBlank() || password.isBlank()) {
-            _uiState.update { it.copy(isLoading = false, error = "Todos los campos son obligatorios") }
+    fun onCorreoChange(correo: String) {
+        _uiState.update { it.copy(correo = correo) }
+    }
+
+    fun onContrasenaChange(contrasena: String) {
+        _uiState.update { it.copy(contrasena = contrasena) }
+    }
+
+    fun onConfirmarContrasenaChange(confirmarContrasena: String) {
+        _uiState.update { it.copy(confirmarContrasena = confirmarContrasena) }
+    }
+
+    // 3. LA LÓGICA DE REGISTRO AHORA USA EL ESTADO INTERNO
+    fun registrar() {
+        _uiState.update { it.copy(estaCargando = true, error = null) }
+
+        val estadoActual = _uiState.value
+
+        if (estadoActual.nombreUsuario.isBlank() || estadoActual.correo.isBlank() || estadoActual.contrasena.isBlank()) {
+            _uiState.update { it.copy(estaCargando = false, error = "Todos los campos son obligatorios") }
             return
         }
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _uiState.update { it.copy(isLoading = false, error = "El formato del correo no es válido") }
+        if (!Patterns.EMAIL_ADDRESS.matcher(estadoActual.correo).matches()) {
+            _uiState.update { it.copy(estaCargando = false, error = "El formato del correo no es válido") }
             return
         }
 
-        if (password != confirmPassword) {
-            _uiState.update { it.copy(isLoading = false, error = "Las contraseñas no coinciden") }
+        if (estadoActual.contrasena != estadoActual.confirmarContrasena) {
+            _uiState.update { it.copy(estaCargando = false, error = "Las contraseñas no coinciden") }
             return
         }
         
-        // Simular llamada a la red o base de datos
         viewModelScope.launch {
-            kotlinx.coroutines.delay(2000) // Simula una operación de red de 2 segundos
-
-            // Aquí iría la lógica real para registrar al usuario en tu backend o BD.
-            // Por ahora, simplemente simulamos el éxito.
-
-            _uiState.update { it.copy(isLoading = false, registrationSuccess = true) }
+            kotlinx.coroutines.delay(2000)
+            _uiState.update { it.copy(estaCargando = false, registroExitoso = true) }
         }
     }
 }
