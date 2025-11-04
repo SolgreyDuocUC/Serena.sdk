@@ -1,6 +1,6 @@
 package com.duocuc.serena.model
 
-data class EmocionesRegistradas (
+data class EmotionsUiState (
     val idEmocion: Int,
     val nombreEmocion: String = ""
 )

@@ -61,13 +61,6 @@ fun HomeScreen() {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // Imagen
-            Image(
-                painter = painterResource(R.drawable.ic_launcher_foreground),
-                contentDescription = "Logo de Serena",
-                modifier = Modifier.size(150.dp)
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(

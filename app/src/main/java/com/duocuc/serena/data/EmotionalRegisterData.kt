@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "RegistroEmocionalUsuario")
-class RegistroEmocionalData (
+class EmotionalRegisterData (
 
     @PrimaryKey(autoGenerate = true)    val idEntradaEmocional: Int = 1,
     @ColumnInfo(name = "idEmocion")     val idEmcoion: Int
