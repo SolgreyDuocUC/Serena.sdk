@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SerenaTheme {
                 val navController = rememberNavController()
-                AppNav(navController)
+                AppNav()
             }
         }
     }

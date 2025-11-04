@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun CalendarScreen(navController: NavController) {
+fun CalendarScreen(navController: NavController, onNavigateBack: () -> Boolean) {
     Scaffold(
         bottomBar = { BottomNavBar(navController = navController) }
     ) { paddingValues ->
