@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,10 +24,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.duocuc.serena.navigation.Route
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+
+// ------------------------- BOTTOM NAVIGATION ------------------------
 
 data class BottomNavItem(
     val route: Route,
@@ -36,12 +41,14 @@ data class BottomNavItem(
 private val bottomNavItems = listOf(
     BottomNavItem(Route.Home, Icons.Filled.FavoriteBorder, "Diario"),
     BottomNavItem(Route.Calendar, Icons.Filled.CalendarToday, "Calendario"),
-    BottomNavItem(Route.Settings, Icons.Filled.Settings, "Config")
+    BottomNavItem(Route.Settings, Icons.Filled.AccountCircle, "Usuario"), // ícono de perfil
+    BottomNavItem(Route.Settings, Icons.Filled.School, "Aprendizaje") // ruta de aprendizaje
 )
 
 @Composable
 fun BottomNavBar(navController: NavController) {
     var selectedItem by remember { mutableStateOf(Route.Calendar.path) }
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         modifier = Modifier.height(80.dp)
@@ -68,63 +75,150 @@ fun BottomNavBar(navController: NavController) {
     }
 }
 
+// ------------------------- DRAWER ITEMS ------------------------
+
+data class DrawerItem(
+    val label: String,
+    val icon: ImageVector
+)
+
+private val drawerItems = listOf(
+    DrawerItem("Ver registro emocional", Icons.Filled.Book),
+    DrawerItem("Leer mensaje del día", Icons.Filled.WbSunny),
+    DrawerItem("Ruta de aprendizaje emocional", Icons.Filled.School),
+    DrawerItem("Devocional", Icons.Filled.Favorite),
+    DrawerItem("Configuración de usuario", Icons.Filled.Settings),
+)
+
+// ------------------------- HOME SCREEN ------------------------
+
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppScreen(nav: NavController) {
-    Scaffold(
-        bottomBar = { BottomNavBar(navController = nav) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                drawerTonalElevation = 4.dp
             ) {
+                Spacer(Modifier.height(24.dp))
+
                 Text(
-                    text = "Hola, Usuario 👋",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    text = "Menú principal",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                drawerItems.forEach { item ->
+                    NavigationDrawerItem(
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { Text(item.label) },
+                        selected = false,
+                        onClick = { /* TODO: navegación a cada pantalla */ },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cerrar sesión") },
+                    label = { Text("Cerrar sesión") },
+                    selected = false,
+                    onClick = { /* TODO: lógica de cierre de sesión */ },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
-            Text(
-                text = "Cada día es una nueva oportunidad para crecer 🏋️",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Gray.copy(alpha = 0.7f),
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            coroutineScope.launch { drawerState.open() }
+                        }) {
+                            Icon(Icons.Filled.Menu, contentDescription = "Menú")
+                        }
+                    },
+                    title = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "Serena 🌿",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                ),
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = "Crecimiento emocional diario",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            },
+            bottomBar = { BottomNavBar(navController = nav) }
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            )
-            Text(
-                text = "Calendario Emocional",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                text = "Visualiza y registra tus emociones cada día",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Gray,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            )
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CalendarContent()
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = "Calendario Emocional",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+
+                Text(
+                    text = "Visualiza y registra tus emociones cada día",
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.Gray),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    CalendarContent()
+                }
             }
         }
     }
 }
+
+// ------------------------- CALENDARIO ------------------------
 
 @Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -240,5 +334,7 @@ fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
         }
     }
 }
+
+
 
 
