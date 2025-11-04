@@ -1,71 +1,72 @@
 package com.duocuc.serena.ui.theme.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.duocuc.serena.R
+import com.duocuc.serena.viewmodel.ProfileViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(onNavigateBack: () -> Unit) {
-    var name by remember { mutableStateOf("Usuario de Prueba") } // Placeholder
-    var email by remember { mutableStateOf("usuario@email.com") } // Placeholder
-    var password by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
-
+fun ProfileScreen(
+    onNavigateBack: () -> Unit,
+    profileViewModel: ProfileViewModel = viewModel()
+) {
     val context = LocalContext.current
+    val name by profileViewModel.name
+    val email by profileViewModel.email
+    val oldPassword by profileViewModel.oldPassword
+    val newPassword by profileViewModel.newPassword
+    val imageUri by profileViewModel.imageUri
+
+    var showDialog by remember { mutableStateOf(false) }
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
+    var showSnackbar by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     fun createTempUri(): Uri {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
+        val imageFileName = "JPEG_$timeStamp"
         val storageDir: File? = context.getExternalFilesDir(null)
         val imageFile = File.createTempFile(imageFileName, ".jpg", storageDir)
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            "com.duocuc.serena.provider",
-            imageFile
-        ).also { tempImageUri = it }
+        return FileProvider.getUriForFile(context, "com.duocuc.serena.provider", imageFile)
+            .also { tempImageUri = it }
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
-            if (success) {
-                imageUri = tempImageUri
-            }
-        }
+        onResult = { success -> if (success) profileViewModel.updateImage(tempImageUri) }
     )
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri -> imageUri = uri }
+        onResult = { uri -> profileViewModel.updateImage(uri) }
     )
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -81,29 +82,27 @@ fun ProfileScreen(onNavigateBack: () -> Unit) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Elige una opción") },
-            text = { Text("¿Desde dónde quieres obtener la imagen?") },
+            title = { Text("Seleccionar imagen") },
+            text = { Text("Elige cómo deseas agregar tu foto de perfil.") },
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false
                     val permission = Manifest.permission.CAMERA
-                    if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(context, permission)
+                        == PackageManager.PERMISSION_GRANTED
+                    ) {
                         val uri = createTempUri()
                         cameraLauncher.launch(uri)
                     } else {
                         cameraPermissionLauncher.launch(permission)
                     }
-                }) {
-                    Text("Tomar foto")
-                }
+                }) { Text("Tomar foto") }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showDialog = false
                     galleryLauncher.launch("image/*")
-                }) {
-                    Text("Galería")
-                }
+                }) { Text("Galería") }
             }
         )
     }
@@ -118,7 +117,8 @@ fun ProfileScreen(onNavigateBack: () -> Unit) {
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -130,53 +130,80 @@ fun ProfileScreen(onNavigateBack: () -> Unit) {
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.clickable { showDialog = true } // Show dialog on click
+                modifier = Modifier
+                    .size(130.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFE0E0E0))
+                    .clickable { showDialog = true }
             ) {
                 if (imageUri != null) {
                     AsyncImage(
                         model = imageUri,
                         contentDescription = "Foto de perfil",
-                        modifier = Modifier.size(120.dp).clip(CircleShape),
+                        modifier = Modifier.size(130.dp).clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier.size(120.dp).clip(CircleShape),
-                        contentScale = ContentScale.Crop
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = "Agregar foto",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(48.dp)
                     )
                 }
             }
-            Text("Toca la imagen para cambiarla", style = MaterialTheme.typography.bodySmall)
+
+            Text("Toca la imagen para cambiarla", color = Color.Gray)
 
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = profileViewModel::updateName,
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = profileViewModel::updateEmail,
                 label = { Text("Correo Electrónico") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Nueva Contraseña") },
+                value = oldPassword,
+                onValueChange = profileViewModel::updateOldPassword,
+                label = { Text("Contraseña actual") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = newPassword,
+                onValueChange = profileViewModel::updateNewPassword,
+                label = { Text("Nueva contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(onClick = { /* TODO: Implement save logic */ }, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = {
+                    profileViewModel.saveProfileChanges()
+                    showSnackbar = true
+                },
+                modifier = Modifier.fillMaxWidth().height(50.dp)
+            ) {
                 Text("Guardar Cambios")
+            }
+
+            if (showSnackbar) {
+                LaunchedEffect(Unit) {
+                    snackbarHostState.showSnackbar("Cambios guardados correctamente")
+                    showSnackbar = false
+                }
             }
         }
     }
 }
+

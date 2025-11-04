@@ -1,20 +1,19 @@
 package com.duocuc.serena.navigation
 
 sealed class Route(val path: String) {
-    object Load : Route("load")                     // Pantalla inicial (Splash o Loading)
-    object Login : Route("login")                   // Inicio de sesión
-    object Register : Route("register")             // Registro de usuario
-    object Home : Route("home")                     // Pantalla principal
-    object Calendar : Route("calendar")             // Calendario emocional
-    object Journal : Route("journal")               // Registro emocional
-    object MessageOfDay : Route("message_day")      // Mensaje del día
-    object LearningPath : Route("learning_path")    // Ruta de aprendizaje emocional
-    object Devotional : Route("devotional")         // Devocional diario
-    object Settings : Route("settings")             // Configuración general
-    object Profile : Route("profile")               // Configuración de usuario
-    object Help : Route("help")                     // Ayuda o soporte
-    object About : Route("about")                   // Acerca de la app
-    object Logout : Route("logout")                 // Cerrar sesión
+    object Load : Route("load")
+    object Login : Route("login")
+    object Register : Route("register")
+    object Home : Route("home")
+    object Calendar : Route("calendar")
+    object Journal : Route("journal")
+    object MessageOfDay : Route("message_day")
+    object LearningPath : Route("learning_path")
+    object Settings : Route("settings")
+    object Profile : Route("profile")
+    object Help : Route("help")
+    object About : Route("about")
+    object Logout : Route("logout")
 }
 
 

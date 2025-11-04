@@ -41,8 +41,8 @@ data class BottomNavItem(
 private val bottomNavItems = listOf(
     BottomNavItem(Route.Home, Icons.Filled.FavoriteBorder, "Diario"),
     BottomNavItem(Route.Calendar, Icons.Filled.CalendarToday, "Calendario"),
-    BottomNavItem(Route.Settings, Icons.Filled.AccountCircle, "Usuario"), // ícono de perfil
-    BottomNavItem(Route.Settings, Icons.Filled.School, "Aprendizaje") // ruta de aprendizaje
+    BottomNavItem(Route.Profile, Icons.Filled.AccountCircle, "Usuario"), // ✅ cambia a Perfil real
+    BottomNavItem(Route.LearningPath, Icons.Filled.School, "Aprendizaje")
 )
 
 @Composable
@@ -86,8 +86,7 @@ private val drawerItems = listOf(
     DrawerItem("Ver registro emocional", Icons.Filled.Book),
     DrawerItem("Leer mensaje del día", Icons.Filled.WbSunny),
     DrawerItem("Ruta de aprendizaje emocional", Icons.Filled.School),
-    DrawerItem("Devocional", Icons.Filled.Favorite),
-    DrawerItem("Configuración de usuario", Icons.Filled.Settings),
+    DrawerItem("Configuración de usuario", Icons.Filled.Settings), // ✅ abre el perfil real
 )
 
 // ------------------------- HOME SCREEN ------------------------
@@ -119,7 +118,15 @@ fun HomeAppScreen(nav: NavController) {
                         icon = { Icon(item.icon, contentDescription = item.label) },
                         label = { Text(item.label) },
                         selected = false,
-                        onClick = { /* TODO: navegación a cada pantalla */ },
+                        onClick = {
+                            when (item.label) {
+                                "Configuración de usuario" -> nav.navigate(Route.Profile.path) // ✅ ahora abre el perfil
+                                "Ver registro emocional" -> nav.navigate(Route.Journal.path)
+                                "Leer mensaje del día" -> nav.navigate(Route.MessageOfDay.path)
+                                "Ruta de aprendizaje emocional" -> nav.navigate(Route.LearningPath.path)
+                            }
+                            coroutineScope.launch { drawerState.close() }
+                        },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                 }
@@ -132,7 +139,7 @@ fun HomeAppScreen(nav: NavController) {
                     icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cerrar sesión") },
                     label = { Text("Cerrar sesión") },
                     selected = false,
-                    onClick = { /* TODO: lógica de cierre de sesión */ },
+                    onClick = { nav.navigate(Route.Logout.path) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
@@ -334,6 +341,8 @@ fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
         }
     }
 }
+
+
 
 
 

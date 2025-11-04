@@ -17,7 +17,6 @@ fun AppNav() {
         navController = navController,
         startDestination = Route.Load.path
     ) {
-        // Pantalla de carga (Splash / Load)
         composable(Route.Load.path) {
             LoadScreen {
                 navController.navigate(Route.Login.path) {
@@ -26,7 +25,6 @@ fun AppNav() {
             }
         }
 
-        // Login
         composable(Route.Login.path) {
             LoginScreen(
                 onLoginSuccess = {
@@ -40,7 +38,6 @@ fun AppNav() {
             )
         }
 
-        // Registro
         composable(Route.Register.path) {
             RegisterScreen(
                 onRegisterSuccess = {
@@ -52,81 +49,37 @@ fun AppNav() {
             )
         }
 
-        // Home (con calendario integrado y menú lateral)
         composable(Route.Home.path) {
             HomeAppScreen(nav = navController)
         }
 
-        // Calendario
-        composable(Route.Calendar.path) {
-            CalendarScreen()
-        }
+        composable(Route.Calendar.path) { CalendarScreen() }
+        composable(Route.Journal.path) { JournalScreen() }
+        composable(Route.MessageOfDay.path) { MessageOfDayScreen() }
+        composable(Route.LearningPath.path) { LearningPathScreen() }
 
-        // Registro emocional (Journal)
-        composable(Route.Journal.path) {
-            JournalScreen()
-        }
-
-        // Mensaje del día
-        composable(Route.MessageOfDay.path) {
-            MessageOfDayScreen()
-        }
-
-        // Ruta de aprendizaje emocional
-        composable(Route.LearningPath.path) {
-            LearningPathScreen()
-        }
-
-        // Devocional
-        composable(Route.Devotional.path) {
-            DevotionalScreen()
-        }
-
-        // Configuración general
-        composable(Route.Settings.path) {
-            SettingsScreen()
-        }
-
-        // Perfil de usuario (configuración personal)
+        // Perfil conectado
         composable(Route.Profile.path) {
-            ProfileScreen()
+            ProfileScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        // Cerrar sesión
-        composable(Route.Logout.path) {
-            LogoutScreen()
-        }
-
-        // Ayuda
-        composable(Route.Help.path) {
-            HelpScreen()
-        }
-
-        // Acerca de la app
-        composable(Route.About.path) {
-            AboutScreen()
-        }
+        composable(Route.Settings.path) { SettingsScreen() }
+        composable(Route.Logout.path) { LogoutScreen() }
+        composable(Route.Help.path) { HelpScreen() }
+        composable(Route.About.path) { AboutScreen() }
     }
 }
 
-@Composable
-fun JournalScreen() {
-    TODO("Not yet implemented")
-}
 
-@Composable
-fun SettingsScreen() {
-    TODO("Not yet implemented")
-}
-
+@Composable fun JournalScreen() {}
 @Composable fun CalendarScreen() {}
 @Composable fun MessageOfDayScreen() {}
 @Composable fun LearningPathScreen() {}
-@Composable fun DevotionalScreen() {}
-@Composable fun ProfileScreen() {}
+@Composable fun SettingsScreen() {}
 @Composable fun LogoutScreen() {}
 @Composable fun HelpScreen() {}
 @Composable fun AboutScreen() {}
+
 
 
 
