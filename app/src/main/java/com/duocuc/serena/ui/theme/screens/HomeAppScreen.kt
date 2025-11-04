@@ -181,7 +181,7 @@ fun HomeAppScreen(nav: NavController) {
             Text(
                 text = "Bienvenido de vuelta. Tu estado mental es clave.",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 25.dp)
             )
 
             CalendarView()

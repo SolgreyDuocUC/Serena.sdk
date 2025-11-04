@@ -19,112 +19,171 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.R
+import com.duocuc.serena.model.LoginUiState
+import com.duocuc.serena.viewmodel.LoginViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
+    onNavigateToRegister: () -> Unit,
+    // 1. Inyectamos el ViewModel
+    loginViewModel: LoginViewModel = viewModel()
+) {
+    // 2. Consumimos el UiState del ViewModel (MVVM)
+    val uiState: LoginUiState by loginViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // 3. Manejo de Efectos Laterales (Navegación y Snackbar)
+    LaunchedEffect(key1 = uiState.isLoginSuccessful, key2 = uiState.loginError) {
+        if (uiState.isLoginSuccessful) {
+            onLoginSuccess()
+        }
+        uiState.loginError?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(it)
+                loginViewModel.clearLoginError()
+            }
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
+        Box(
+            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                LoginFormulario(uiState, loginViewModel, onLoginSuccess, onNavigateToRegister)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoginFormulario(
+    uiState: LoginUiState,
+    viewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+    Card(
+        modifier = Modifier.fillMaxWidth(0.9f),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(0.9f),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Spacer(modifier = Modifier.height(8.dp))
+            Image(
+                painter = painterResource(id = R.mipmap.ic_google_launcher_foreground),
+                contentDescription = "Logo Serena",
+                modifier = Modifier.size(80.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Bienvenido",
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Inicia sesión en Serena",
+                color = Color.Gray,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Campo Correo (Consume estado y error del ViewModel - RF-02) ---
+            OutlinedTextField(
+                value = uiState.userEmail,
+                onValueChange = viewModel::onUserEmailChange,
+                label = { Text("Correo electrónico") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                isError = uiState.userEmailError != null,
+                supportingText = {
+                    if (uiState.userEmailError != null) {
+                        Text(uiState.userEmailError!!)
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- Campo Contraseña (Consume estado y error del ViewModel - RF-02) ---
+            OutlinedTextField(
+                value = uiState.userPassword,
+                onValueChange = viewModel::onUserPasswordChange,
+                label = { Text("Contraseña") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                isError = uiState.userPasswordError != null,
+                supportingText = {
+                    if (uiState.userPasswordError != null) {
+                        Text(uiState.userPasswordError!!)
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Botón Login ---
+            Button(
+                onClick = viewModel::login, // Llama a la lógica centralizada
+                modifier = Modifier.fillMaxWidth(),
+                // Clave: Deshabilitado si la validación falla (RF-03)
+                enabled = uiState.isFormValid && !uiState.isLoading
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Text("Iniciar sesión")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Botón estilizado de Google ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Color(0xFFDDDDDD),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .clickable { onLoginSuccess() }, // Navegación directa
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.width(12.dp))
                 Image(
                     painter = painterResource(id = R.mipmap.ic_google_launcher_foreground),
-                    contentDescription = "Logo Serena",
-                    modifier = Modifier.size(80.dp)
+                    contentDescription = "Google logo",
+                    modifier = Modifier.size(24.dp)
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Bienvenido",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "Continuar con Google",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
                 )
-                Text(
-                    text = "Inicia sesión en Serena",
-                    color = Color.Gray,
-                    fontSize = 16.sp
-                )
+                Spacer(modifier = Modifier.width(12.dp))
+            }
 
-                Spacer(modifier = Modifier.height(24.dp))
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Correo electrónico") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña") },
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password) // Aseguramos el teclado de contraseña
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-                Button(
-                    onClick = onLoginSuccess,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Iniciar sesión")
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Botón estilizado de Google
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color(0xFFDDDDDD),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .background(Color.White, shape = RoundedCornerShape(8.dp))
-                        .clickable { onLoginSuccess() }, // Aquí luego pones la lógica real de Google
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Image(
-                        painter = painterResource(id = R.mipmap.ic_google_launcher_foreground),
-                        contentDescription = "Google logo",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "Continuar con Google",
-                        color = Color.Black,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                TextButton(onClick = onNavigateToRegister) {
-                    Text("Crear cuenta nueva")
-                }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = onNavigateToRegister) {
+                Text("Crear cuenta nueva")
             }
         }
     }
