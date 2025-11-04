@@ -1,5 +1,7 @@
 package com.duocuc.serena.ui.theme.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +22,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.duocuc.serena.navigation.Route
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 data class BottomNavItem(
     val route: Route,
@@ -36,7 +42,6 @@ private val bottomNavItems = listOf(
 @Composable
 fun BottomNavBar(navController: NavController) {
     var selectedItem by remember { mutableStateOf(Route.Calendar.path) }
-
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         modifier = Modifier.height(80.dp)
@@ -63,6 +68,7 @@ fun BottomNavBar(navController: NavController) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeAppScreen(nav: NavController) {
     Scaffold(
@@ -120,16 +126,27 @@ fun HomeAppScreen(nav: NavController) {
     }
 }
 
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarContent() {
+    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+    val today = LocalDate.now()
     val daysOfWeek = listOf("Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb")
+    val firstDayOfMonth = currentMonth.atDay(1)
+    val daysInMonth = currentMonth.lengthOfMonth()
+    val startDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
+    val totalCells = ((startDayOfWeek + daysInMonth + 6) / 7) * 7
+    val days = (0 until totalCells).map { index ->
+        val dayNumber = index - startDayOfWeek + 1
+        if (dayNumber in 1..daysInMonth) dayNumber else null
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        // --- Controles de Mes ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,25 +155,24 @@ fun CalendarContent() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedIconButton(
-                onClick = {},
+                onClick = { currentMonth = currentMonth.minusMonths(1) },
                 modifier = Modifier.size(36.dp),
                 shape = RoundedCornerShape(8.dp)
             ) { Icon(Icons.Filled.ChevronLeft, contentDescription = "Mes anterior") }
 
             Text(
-                "Noviembre de 2025",
+                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es"))} de ${currentMonth.year}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             OutlinedIconButton(
-                onClick = {},
+                onClick = { currentMonth = currentMonth.plusMonths(1) },
                 modifier = Modifier.size(36.dp),
                 shape = RoundedCornerShape(8.dp)
             ) { Icon(Icons.Filled.ChevronRight, contentDescription = "Mes siguiente") }
         }
 
-        // --- Días de la Semana ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -175,33 +191,20 @@ fun CalendarContent() {
 
         Spacer(Modifier.height(8.dp))
 
-        // --- Días del mes ---
-        val dummyDays = listOf(
-            null, null, null, null, null, null, 1,
-            2, 3, 4, 5, 6, 7, 8,
-            9, 10, 11, 12, 13, 14, 15,
-            16, 17, 18, 19, 20, 21, 22,
-            23, 24, 25, 26, 27, 28, 29,
-            30, null, null, null, null, null, null
-        )
-        val rows = dummyDays.chunked(7)
-        val today = 28
-
-        // --- Ajuste proporcional del tamaño de celda ---
+        val rows = days.chunked(7)
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val totalWidth = this.maxWidth
-            val dayCellSize = (totalWidth / 7) - 6.dp // resta margen entre días
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
+            val dayCellSize = (totalWidth / 7) - 6.dp
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 rows.forEach { row ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         row.forEach { day ->
-                            DayCellAlternative(day, day == today, dayCellSize)
+                            val date = day?.let { currentMonth.atDay(it) }
+                            val isToday = date == today
+                            DayCellAlternative(day, isToday, dayCellSize)
                         }
                     }
                 }
@@ -219,8 +222,6 @@ fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
             .background(
                 when {
                     isSelected -> MaterialTheme.colorScheme.primary
-                    day != null && day > 4 && day % 3 == 0 ->
-                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
                     else -> Color.Transparent
                 }
             )
@@ -239,4 +240,5 @@ fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
         }
     }
 }
+
 

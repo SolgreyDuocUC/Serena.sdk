@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,9 +26,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun AppNav(navController1: NavHostController) {
-
     val navController = rememberNavController()
-
     NavHost(
         navController = navController,
         startDestination = Route.Splash.path
@@ -42,7 +40,6 @@ fun AppNav(navController1: NavHostController) {
                 }
             }
         }
-
         composable(Route.Login.path) {
             LoginScreen(
                 onLoginSuccess = {
@@ -55,7 +52,6 @@ fun AppNav(navController1: NavHostController) {
                 }
             )
         }
-
         composable(Route.Register.path) {
             RegisterScreen(
                 onRegisterSuccess = {
@@ -66,29 +62,52 @@ fun AppNav(navController1: NavHostController) {
                 onNavigateToLogin = { navController.popBackStack() }
             )
         }
-
         composable(Route.Home.path) {
             HomeAppScreen(nav = navController)
         }
-
         composable(Route.Calendar.path) {
-            HomeAppScreen(nav = navController)
+            CalendarScreen(onNavigateBack = { navController.popBackStack() })
         }
-
         composable(Route.Settings.path) {
             SettingsScreen(onNavigateBack = { navController.popBackStack() })
         }
-
         composable(Route.Journal.path) {
             JournalScreen(onNavigateBack = { navController.popBackStack() })
         }
-
         composable(Route.Analysis.path) {
             AnalysisScreen(onNavigateBack = { navController.popBackStack() })
         }
-
         composable(Route.Profile.path) {
             ProfileScreen(onNavigateBack = { navController.popBackStack() })
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CalendarScreen(onNavigateBack: () -> Unit) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Calendario Emocional") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Pantalla de calendario emocional en construcción")
         }
     }
 }
@@ -103,7 +122,7 @@ fun AnalysisScreen(onNavigateBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.ArrowBack,
+                            imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver"
                         )
                     }
@@ -132,7 +151,7 @@ fun JournalScreen(onNavigateBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.ArrowBack,
+                            imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver"
                         )
                     }
@@ -161,7 +180,7 @@ fun SettingsScreen(onNavigateBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.ArrowBack,
+                            imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver"
                         )
                     }
@@ -195,4 +214,6 @@ fun SplashScreen() {
         )
     }
 }
+
+
 
