@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.duocuc.serena.navigation.Route
@@ -81,7 +82,7 @@ fun HomeAppScreen(nav: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Hola, Usuario",
+                    text = "Hola, Usuario 👋",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -128,10 +129,37 @@ fun CalendarContent() {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
+        // --- Controles de Mes ---
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedIconButton(
+                onClick = {},
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) { Icon(Icons.Filled.ChevronLeft, contentDescription = "Mes anterior") }
 
+            Text(
+                "Noviembre de 2025",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            OutlinedIconButton(
+                onClick = {},
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) { Icon(Icons.Filled.ChevronRight, contentDescription = "Mes siguiente") }
+        }
+
+        // --- Días de la Semana ---
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             daysOfWeek.forEach { day ->
                 Text(
@@ -147,6 +175,7 @@ fun CalendarContent() {
 
         Spacer(Modifier.height(8.dp))
 
+        // --- Días del mes ---
         val dummyDays = listOf(
             null, null, null, null, null, null, 1,
             2, 3, 4, 5, 6, 7, 8,
@@ -156,21 +185,24 @@ fun CalendarContent() {
             30, null, null, null, null, null, null
         )
         val rows = dummyDays.chunked(7)
-        val today = 4
+        val today = 28
 
+        // --- Ajuste proporcional del tamaño de celda ---
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val totalWidth = this.maxWidth
-            val dayCellSize = totalWidth / 7
+            val dayCellSize = (totalWidth / 7) - 6.dp // resta margen entre días
 
-            rows.forEach { row ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    row.forEach { day ->
-                        DayCellAlternative(day, day == today, dayCellSize)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                rows.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        row.forEach { day ->
+                            DayCellAlternative(day, day == today, dayCellSize)
+                        }
                     }
                 }
             }
@@ -179,39 +211,32 @@ fun CalendarContent() {
 }
 
 @Composable
-fun DayCellAlternative(day: Int?, isSelected: Boolean, size: androidx.compose.ui.unit.Dp) {
+fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
     Box(
         modifier = Modifier
-            .width(size)
-            .height(size)
-            .padding(2.dp),
+            .size(size)
+            .clip(CircleShape)
+            .background(
+                when {
+                    isSelected -> MaterialTheme.colorScheme.primary
+                    day != null && day > 4 && day % 3 == 0 ->
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                    else -> Color.Transparent
+                }
+            )
+            .clickable(enabled = day != null) { },
         contentAlignment = Alignment.Center
     ) {
         if (day != null) {
-            val hasEntry = day > 4 && day % 3 == 0
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(0.9f)
-                    .clip(CircleShape)
-                    .background(
-                        when {
-                            isSelected -> MaterialTheme.colorScheme.primary
-                            hasEntry -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                            else -> Color.Transparent
-                        }
-                    )
-                    .clickable { },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = day.toString(),
-                    color = if (isSelected)
-                        MaterialTheme.colorScheme.onPrimary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (day < 4) 0.3f else 1f),
-                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal
-                )
-            }
+            Text(
+                text = day.toString(),
+                color = if (isSelected)
+                    MaterialTheme.colorScheme.onPrimary
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            )
         }
     }
 }
+
