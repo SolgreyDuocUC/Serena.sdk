@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlin.Result
 
 class UserRepository {
+
     suspend fun registerUser(
         email: String,
         password: String,
@@ -21,20 +22,13 @@ class UserRepository {
 
     suspend fun loginUser(
         email: String,
-        password: String,
+        password: String
     ): Result<Boolean> {
         delay(500)
-        val correctEmail = "test@serena.com"
-        val correctPassword = "Password123"
-
         if (email.contains("servererror")) {
             return Result.failure(Exception("Error de servidor no disponible."))
         }
 
-        if (email == correctEmail && password == correctPassword) {
-            return Result.success(true)
-        } else {
-            return Result.failure(Exception("Email o contraseña incorrectos."))
-        }
+        return Result.success(true)
     }
 }
