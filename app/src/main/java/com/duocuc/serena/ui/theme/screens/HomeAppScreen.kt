@@ -34,9 +34,6 @@ private val bottomNavItems = listOf(
     BottomNavItem(Route.Analysis, Icons.Filled.Insights, "Análisis")
 )
 
-// ----------------------
-// BARRA DE NAVEGACIÓN INFERIOR
-// ----------------------
 @Composable
 fun BottomNavBar(navController: NavController) {
     var selectedItem by remember { mutableStateOf(Route.Home.path) }
@@ -59,9 +56,6 @@ fun BottomNavBar(navController: NavController) {
     }
 }
 
-// ----------------------
-// CALENDARIO SIMPLIFICADO
-// ----------------------
 @Composable
 fun CalendarView() {
     val daysOfWeek = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
@@ -71,7 +65,6 @@ fun CalendarView() {
             .fillMaxWidth()
             .padding(top = 16.dp)
     ) {
-        // Encabezado del mes
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -89,7 +82,6 @@ fun CalendarView() {
 
         Spacer(Modifier.height(16.dp))
 
-        // Días de la semana
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
@@ -107,7 +99,6 @@ fun CalendarView() {
 
         Spacer(Modifier.height(8.dp))
 
-        // Días del mes (mock)
         val dummyDays = listOf(
             null, null, null, null, 1, 2, 3,
             4, 5, 6, 7, 8, 9, 10,
@@ -160,9 +151,6 @@ fun CalendarView() {
     }
 }
 
-// ----------------------
-// PANTALLA PRINCIPAL (HOME)
-// ----------------------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppScreen(nav: NavController) {

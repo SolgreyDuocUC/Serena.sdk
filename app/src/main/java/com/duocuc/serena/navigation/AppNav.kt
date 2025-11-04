@@ -11,12 +11,11 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun AppNav(navController1: NavHostController) {
-    // Este controlador es el principal de navegación de la app
+
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Route.Splash.path) {
 
-        // --- Splash ---
         composable(Route.Splash.path) {
             HomeScreen()
             LaunchedEffect(Unit) {
@@ -27,7 +26,6 @@ fun AppNav(navController1: NavHostController) {
             }
         }
 
-        // --- Login ---
         composable(Route.Login.path) {
             LoginScreen(
                 onLoginSuccess = {
@@ -41,7 +39,6 @@ fun AppNav(navController1: NavHostController) {
             )
         }
 
-        // --- Registro ---
         composable(Route.Register.path) {
             RegisterScreen(
                 onRegisterSuccess = {
@@ -53,12 +50,10 @@ fun AppNav(navController1: NavHostController) {
             )
         }
 
-        // --- Pantalla Principal (HomeAppScreen) ---
         composable(Route.Home.path) {
             HomeAppScreen(nav = navController)
         }
 
-        // --- Subpantallas internas ---
         composable(Route.Journal.path) {
             JournalScreen(
                 onNavigateBack = { navController.popBackStack() }

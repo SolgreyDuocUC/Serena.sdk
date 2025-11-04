@@ -2,72 +2,186 @@ package com.duocuc.serena.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duocuc.serena.model.UserUiState
+import com.duocuc.serena.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import android.util.Patterns
 
-// 1. EstadoRegistroUi CONTIENE TODO EL ESTADO DE LA PANTALLA
-data class EstadoRegistroUi(
-    // Estado de los campos del formulario
-    val nombreUsuario: String = "",
-    val correo: String = "",
-    val contrasena: String = "",
-    val confirmarContrasena: String = "",
+class RegisterViewModel(
+    private val userRepository: UserRepository = UserRepository()
+) : ViewModel() {
 
-    // Estado de los eventos de la UI
-    val estaCargando: Boolean = false,
-    val registroExitoso: Boolean = false,
-    val error: String? = null
-)
+    private val _uiState = MutableStateFlow(UserUiState())
+    val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
 
-class RegisterViewModel : ViewModel() {
-
-    private val _uiState = MutableStateFlow(EstadoRegistroUi())
-    val uiState = _uiState.asStateFlow()
-
-    // 2. FUNCIONES PARA MANEJAR LOS CAMBIOS EN LA UI
-    fun onNombreUsuarioChange(nombreUsuario: String) {
-        _uiState.update { it.copy(nombreUsuario = nombreUsuario) }
+    fun onUserNameChange(newUserName: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                userName = newUserName,
+                userNameError = if (newUserName.length >= 3) null else "El nombre debe tener al menos 3 caracteres"
+            )
+        }
     }
 
-    fun onCorreoChange(correo: String) {
-        _uiState.update { it.copy(correo = correo) }
+    fun onUserLastNameChange(newLastName: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                userLastName = newLastName,
+                userLastNameError = if (newLastName.length >= 3) null else "El apellido debe tener al menos 3 caracteres"
+            )
+        }
     }
 
-    fun onContrasenaChange(contrasena: String) {
-        _uiState.update { it.copy(contrasena = contrasena) }
+    fun onUserAgeChange(newAge: String) {
+        val ageError = try {
+            val age = newAge.toInt()
+            when {
+                age < 18 -> "Debes ser mayor de 18 años"
+                age > 120 -> "Edad no válida"
+                else -> null
+            }
+        } catch (e: NumberFormatException) {
+            "La edad debe ser un número válido"
+        }
+        _uiState.update { currentState ->
+            currentState.copy(
+                userAge = newAge,
+                userAgeError = if (newAge.isEmpty()) "La edad no puede estar vacía" else ageError
+            )
+        }
     }
 
-    fun onConfirmarContrasenaChange(confirmarContrasena: String) {
-        _uiState.update { it.copy(confirmarContrasena = confirmarContrasena) }
+    fun onUserEmailChange(newEmail: String) {
+        _uiState.update { currentState ->
+            val emailRegex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
+            currentState.copy(
+                userEmail = newEmail,
+                userEmailError = if (newEmail.matches(emailRegex.toRegex())) null else "Formato de email no válido"
+            )
+        }
     }
 
-    // 3. LA LÓGICA DE REGISTRO AHORA USA EL ESTADO INTERNO
-    fun registrar() {
-        _uiState.update { it.copy(estaCargando = true, error = null) }
+    fun onUserPasswordChange(newPassword: String) {
+        _uiState.update { currentState ->
+            val error = when {
+                newPassword.length < 8 -> "La contraseña debe tener al menos 8 caracteres"
+                !newPassword.any { it.isDigit() } -> "Debe contener al menos un número"
+                else -> null
+            }
+            currentState.copy(
+                userPassword = newPassword,
+                userPasswordError = error,
+                userRepeatPasswordError = if (currentState.userRepeatPassword.isNotEmpty() && currentState.userRepeatPassword != newPassword) "Las contraseñas no coinciden" else null
+            )
+        }
+    }
 
-        val estadoActual = _uiState.value
+    fun onUserRepeatPasswordChange(newRepeatPassword: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                userRepeatPassword = newRepeatPassword,
+                userRepeatPasswordError = if (newRepeatPassword == currentState.userPassword) null else "Las contraseñas no coinciden"
+            )
+        }
+    }
 
-        if (estadoActual.nombreUsuario.isBlank() || estadoActual.correo.isBlank() || estadoActual.contrasena.isBlank()) {
-            _uiState.update { it.copy(estaCargando = false, error = "Todos los campos son obligatorios") }
+    fun onUserAcceptConditionsChange(accepted: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                userAcceptConditions = accepted,
+                userAcceptConditionsError = if (accepted) null else "Debe aceptar las condiciones"
+            )
+        }
+    }
+
+    fun clearRegistrationError() {
+        _uiState.update { it.copy(registrationError = null) }
+    }
+
+    private fun validateAllFields(currentState: UserUiState): UserUiState {
+        val nameError = if (currentState.userName.length >= 3) null else "El nombre debe tener al menos 3 caracteres"
+        val lastNameError = if (currentState.userLastName.length >= 3) null else "El apellido debe tener al menos 3 caracteres"
+
+        val ageError = try {
+            val age = currentState.userAge.toInt()
+            when {
+                currentState.userAge.isEmpty() -> "La edad no puede estar vacía"
+                age < 18 -> "Debes ser mayor de 18 años"
+                age > 120 -> "Edad no válida"
+                else -> null
+            }
+        } catch (e: NumberFormatException) {
+            "La edad debe ser un número válido"
+        }
+
+        val emailRegex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
+        val emailError = if (currentState.userEmail.matches(emailRegex.toRegex())) null else "Formato de email no válido"
+
+        val passwordError = when {
+            currentState.userPassword.length < 8 -> "La contraseña debe tener al menos 8 caracteres"
+            !currentState.userPassword.any { it.isDigit() } -> "Debe contener al menos un número"
+            else -> null
+        }
+
+        val repeatPasswordError = if (currentState.userRepeatPassword == currentState.userPassword && currentState.userRepeatPassword.isNotEmpty()) null else "Las contraseñas no coinciden"
+
+        val conditionsError = if (currentState.userAcceptConditions) null else "Debe aceptar las condiciones"
+
+        return currentState.copy(
+            userNameError = nameError,
+            userLastNameError = lastNameError,
+            userAgeError = ageError,
+            userEmailError = emailError,
+            userPasswordError = passwordError,
+            userRepeatPasswordError = repeatPasswordError,
+            userAcceptConditionsError = conditionsError
+        )
+    }
+
+    fun register() {
+        _uiState.update { currentState ->
+            validateAllFields(currentState)
+        }
+
+        val state = _uiState.value
+
+        if (!state.isFormValid) {
             return
         }
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(estadoActual.correo).matches()) {
-            _uiState.update { it.copy(estaCargando = false, error = "El formato del correo no es válido") }
-            return
-        }
+        _uiState.update { it.copy(isLoading = true, registrationError = null) }
 
-        if (estadoActual.contrasena != estadoActual.confirmarContrasena) {
-            _uiState.update { it.copy(estaCargando = false, error = "Las contraseñas no coinciden") }
-            return
-        }
-        
         viewModelScope.launch {
-            kotlinx.coroutines.delay(2000)
-            _uiState.update { it.copy(estaCargando = false, registroExitoso = true) }
+            try {
+                val result = userRepository.registerUser(
+                    email = state.userEmail,
+                    password = state.userPassword,
+                    name = state.userName,
+                    lastName = state.userLastName,
+                    age = state.userAge
+                )
+
+                if (result.isSuccess) {
+                    _uiState.update { it.copy(
+                        isRegistrationSuccessful = true,
+                        isLoading = false
+                    )}
+                } else {
+                    _uiState.update { it.copy(
+                        registrationError = result.exceptionOrNull()?.message ?: "Error desconocido en el registro.",
+                        isLoading = false
+                    )}
+                }
+
+            } catch (e: Exception) {
+                _uiState.update { it.copy(
+                    registrationError = e.message ?: "Error de red o conexión.",
+                    isLoading = false
+                )}
+            }
         }
     }
 }
