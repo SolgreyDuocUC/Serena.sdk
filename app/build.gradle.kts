@@ -7,9 +7,7 @@ plugins {
 
 android {
     namespace = "com.duocuc.serena"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.duocuc.serena"
@@ -29,23 +27,25 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-    // --- Compose & ViewModel ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -54,30 +54,23 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.foundation:foundation")
-    implementation(libs.compose.material3) // Redundante, pero se mantiene si libs apunta a otra versión
+    implementation(libs.compose.material3)
 
-    // --- Navigation ---
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation ("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
-
-    implementation ("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation("androidx.activity:activity-compose:1.9.3")
 
-
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout.android)
+    implementation(libs.androidx.compose.foundation.layout.android)
+    implementation(libs.androidx.compose.foundation.layout.android)
     kapt("androidx.room:room-compiler:2.6.1")
 
-    // --- HILT (Recomendado para MVVM/RF-06) ---
-    // Se puede usar con Hilt para inyección de dependencias:
-    // implementation("com.google.dagger:hilt-android:2.51.1")
-    // ksp("com.google.dagger:hilt-compiler:2.51.1")
-    // implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-
-    // --- Testing ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

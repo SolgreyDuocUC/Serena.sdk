@@ -1,44 +1,45 @@
 package com.duocuc.serena.ui.theme.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.filled.SelfImprovement
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.duocuc.serena.navigation.Route
 
-// ----------------------
-// MODELOS Y CONFIGURACIÓN
-// ----------------------
 data class BottomNavItem(
     val route: Route,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val icon: ImageVector,
     val label: String
 )
 
 private val bottomNavItems = listOf(
-    BottomNavItem(Route.Home, Icons.Filled.Home, "Inicio"),
-    BottomNavItem(Route.Journal, Icons.Filled.SelfImprovement, "Diario"),
-    BottomNavItem(Route.Analysis, Icons.Filled.Insights, "Análisis")
+    BottomNavItem(Route.Home, Icons.Filled.FavoriteBorder, "Diario"),
+    BottomNavItem(Route.Calendar, Icons.Filled.CalendarToday, "Calendario"),
+    BottomNavItem(Route.Settings, Icons.Filled.Settings, "Config")
 )
 
 @Composable
 fun BottomNavBar(navController: NavController) {
-    var selectedItem by remember { mutableStateOf(Route.Home.path) }
+    var selectedItem by remember { mutableStateOf(Route.Calendar.path) }
 
-    NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        modifier = Modifier.height(80.dp)
+    ) {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
@@ -47,40 +48,86 @@ fun BottomNavBar(navController: NavController) {
                 onClick = {
                     selectedItem = item.route.path
                     navController.navigate(item.route.path) {
-                        popUpTo(Route.Home.path) { inclusive = false }
+                        popUpTo(navController.graph.startDestinationId)
                         launchSingleTop = true
                     }
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                )
             )
         }
     }
 }
 
 @Composable
-fun CalendarView() {
-    val daysOfWeek = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
+fun HomeAppScreen(nav: NavController) {
+    Scaffold(
+        bottomBar = { BottomNavBar(navController = nav) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Hola, Usuario",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                text = "Cada día es una nueva oportunidad para crecer 🏋️",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Gray.copy(alpha = 0.7f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            Text(
+                text = "Calendario Emocional",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = "Visualiza y registra tus emociones cada día",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Gray,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                CalendarContent()
+            }
+        }
+    }
+}
+
+@Composable
+fun CalendarContent() {
+    val daysOfWeek = listOf("Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb")
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp)
+            .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Noviembre 2025",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Icon(Icons.Default.CalendarMonth, contentDescription = "Cambiar mes")
-        }
-
-        Spacer(Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -89,10 +136,11 @@ fun CalendarView() {
             daysOfWeek.forEach { day ->
                 Text(
                     text = day,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(36.dp)
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -100,50 +148,29 @@ fun CalendarView() {
         Spacer(Modifier.height(8.dp))
 
         val dummyDays = listOf(
-            null, null, null, null, 1, 2, 3,
-            4, 5, 6, 7, 8, 9, 10,
-            11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24,
-            25, 26, 27, 28, 29, 30, null
+            null, null, null, null, null, null, 1,
+            2, 3, 4, 5, 6, 7, 8,
+            9, 10, 11, 12, 13, 14, 15,
+            16, 17, 18, 19, 20, 21, 22,
+            23, 24, 25, 26, 27, 28, 29,
+            30, null, null, null, null, null, null
         )
         val rows = dummyDays.chunked(7)
-        val today = 18
+        val today = 4
 
-        rows.forEach { row ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                row.forEach { day ->
-                    val isToday = day == today
-                    val hasEntry = day != null && day % 5 == 0
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val totalWidth = this.maxWidth
+            val dayCellSize = totalWidth / 7
 
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(
-                                when {
-                                    isToday -> MaterialTheme.colorScheme.primary
-                                    hasEntry -> MaterialTheme.colorScheme.tertiaryContainer
-                                    else -> MaterialTheme.colorScheme.surface
-                                }
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (day != null) {
-                            Text(
-                                text = day.toString(),
-                                color = if (isToday)
-                                    MaterialTheme.colorScheme.onPrimary
-                                else
-                                    MaterialTheme.colorScheme.onSurface,
-                                fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.Normal
-                            )
-                        }
+            rows.forEach { row ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    row.forEach { day ->
+                        DayCellAlternative(day, day == today, dayCellSize)
                     }
                 }
             }
@@ -151,48 +178,39 @@ fun CalendarView() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeAppScreen(nav: NavController) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "Serena: Tu Espacio Mental",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
+fun DayCellAlternative(day: Int?, isSelected: Boolean, size: androidx.compose.ui.unit.Dp) {
+    Box(
+        modifier = Modifier
+            .width(size)
+            .height(size)
+            .padding(2.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (day != null) {
+            val hasEntry = day > 4 && day % 3 == 0
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(0.9f)
+                    .clip(CircleShape)
+                    .background(
+                        when {
+                            isSelected -> MaterialTheme.colorScheme.primary
+                            hasEntry -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                            else -> Color.Transparent
+                        }
                     )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
-        bottomBar = { BottomNavBar(navController = nav) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Bienvenido de vuelta. Tu estado mental es clave.",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 25.dp)
-            )
-
-            CalendarView()
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = { nav.navigate(Route.Journal.path) },
-                shape = RoundedCornerShape(12.dp)
+                    .clickable { },
+                contentAlignment = Alignment.Center
             ) {
-                Text("Registrar Emoción de Hoy")
+                Text(
+                    text = day.toString(),
+                    color = if (isSelected)
+                        MaterialTheme.colorScheme.onPrimary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (day < 4) 0.3f else 1f),
+                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal
+                )
             }
         }
     }
