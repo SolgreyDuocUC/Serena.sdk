@@ -1,5 +1,7 @@
 package com.duocuc.serena.ui.theme.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -8,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(navController: NavController, onNavigateBack: () -> Boolean) {
     Scaffold(

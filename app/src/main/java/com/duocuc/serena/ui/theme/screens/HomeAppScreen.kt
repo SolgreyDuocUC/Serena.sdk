@@ -228,8 +228,12 @@ fun HomeAppScreen(nav: NavController) {
 
 // ------------------------- REGISTRO EMOCIONAL ------------------------
 
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun EmotionalRegisteredScreen(){
 
-
+}
 
 // ------------------------- CALENDARIO ------------------------
 
