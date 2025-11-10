@@ -21,16 +21,11 @@ interface UserDAO {
     @Query("SELECT * FROM usuarios WHERE id IN (:userIds)")
     fun loadAllByIds(userIds: IntArray): List<UserData>
 
-    @Query("SELECT * FROM usuarios WHERE nombreUsuario LIKE :nombreUsuario AND " +
-            "nombreUsuario LIKE :last LIMIT 1")
-    fun findByName(first: String, last: String): UserUiState
-
     @Insert
     fun insertAll(vararg users: UserData)
 
     @Delete
     fun delete(user: UserData)
 
-    //Agregar Consultas Personalizadas
 
 }
