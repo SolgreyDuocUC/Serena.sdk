@@ -7,8 +7,6 @@ data class UserUiState(
     val userRepeatPassword: String = "",
     val userAcceptConditions: Boolean = false,
     val userNameError: String? = null,
-    val userLastNameError: String? = null,
-    val userAgeError: String? = null,
     val userEmailError: String? = null,
     val userPasswordError: String? = null,
     val userRepeatPasswordError: String? = null,

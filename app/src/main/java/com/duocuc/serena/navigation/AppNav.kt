@@ -3,7 +3,6 @@ package com.duocuc.serena.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -54,37 +53,22 @@ fun AppNav() {
             HomeAppScreen(nav = navController)
         }
 
-        composable(Route.Calendar.path) { CalendarScreen() }
-        composable(Route.Journal.path) { JournalScreen() }
-        composable(Route.MessageOfDay.path) { MessageOfDayScreen() }
-        composable(Route.LearningPath.path) { LearningPathScreen() }
+        composable(Route.Calendar.path) { /* Placeholder */ }
+        composable(Route.Journal.path) { /* Placeholder */ }
+        composable(Route.MessageOfDay.path) { /* Placeholder */ }
+        composable(Route.LearningPath.path) { LearningPathScreen(navController = navController) }
 
         // Perfil conectado
         composable(Route.Profile.path) {
             ProfileScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        composable(Route.Settings.path) { SettingsScreen() }
-        composable(Route.Logout.path) { LogoutScreen() }
-        composable(Route.Help.path) { HelpScreen() }
-        composable(Route.About.path) { AboutScreen() }
+        composable(Route.Settings.path) { /* Placeholder */ }
+        composable(Route.Logout.path) { /* Placeholder */ }
+        composable(Route.Help.path) { /* Placeholder */ }
+        composable(Route.About.path) { /* Placeholder */ }
 
         composable(Route.EmotionalRegistered.path){ EmotionalRegisteredScreen()}
 
-        }
+    }
 }
-
-
-@Composable fun JournalScreen() {}
-@Composable fun CalendarScreen() {}
-@Composable fun MessageOfDayScreen() {}
-@Composable fun LearningPathScreen() {}
-@Composable fun SettingsScreen() {}
-@Composable fun LogoutScreen() {}
-@Composable fun HelpScreen() {}
-@Composable fun AboutScreen() {}
-
-
-
-
-

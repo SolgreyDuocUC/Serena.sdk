@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val userRepository: UserRepository = UserRepository()
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -78,7 +78,7 @@ class LoginViewModel(
             try {
                 val result = userRepository.loginUser(state.userEmail, state.userPassword)
 
-                if (result.isSuccess) {
+                if (result.isSuccess && result.getOrNull() != null) {
                     _uiState.update { it.copy(
                         isLoginSuccessful = true,
                         isLoading = false

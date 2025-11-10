@@ -2,14 +2,26 @@ package com.duocuc.serena.bases
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.Entity
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.duocuc.serena.DAO.UserDAO
+import com.duocuc.serena.data.UserData
+import com.duocuc.serena.data.UserActiveSession
+import com.duocuc.serena.DAO.UserSessionDao
+import com.duocuc.serena.data.EmotionalRegisterData
+import com.duocuc.serena.DAO.RegistroEmocionalDao
 
-@Database(entities = [Entity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [UserData::class, UserActiveSession::class, EmotionalRegisterData::class],
+    version = 3, // Incrementar la versión por el cambio de esquema
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDAO
+    abstract fun userSessionDao(): UserSessionDao
+    abstract fun registroEmocionalDao(): RegistroEmocionalDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
@@ -20,7 +32,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "serena.db"
-                ).build().also { INSTANCE = it }
+                )
+                .fallbackToDestructiveMigration() // Opcional: para evitar crashes en desarrollo
+                .build().also { INSTANCE = it }
             }
     }
 }

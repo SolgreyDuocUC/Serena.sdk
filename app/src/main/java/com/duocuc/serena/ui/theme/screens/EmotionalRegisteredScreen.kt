@@ -66,7 +66,7 @@ fun EmotionalRegisteredScreen(viewModel: EmotionalRegisterViewModel = viewModel(
                             modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("ID Emoción: ${register.idEmcoion}")
+                            Text("ID Emoción: ${register.idEmocion}")
                         }
                     }
                 }

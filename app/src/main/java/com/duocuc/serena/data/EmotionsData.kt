@@ -1,12 +1,49 @@
 package com.duocuc.serena.data
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.compose.ui.graphics.Color
+import com.duocuc.serena.model.Emotion
 
-@Entity(tableName = "Emociones")
-class EmotionsData (
-    @PrimaryKey(autoGenerate = true)    val idEntradaEmocional: Int = 1,
-    @ColumnInfo(name = "nombreEmocion") val nombreEmocion: String,
-    @ColumnInfo(name = "descripcionEmocion") val descripcionEmocion: String
-    )
+val emotionsList = listOf(
+    Emotion(1, "Alegría", "Un estado de felicidad y satisfacción...", Color(0xFFFDE68A), Color(0xFF92400E)),
+    Emotion(2, "Amor", "Un sentimiento profundo de afecto...", Color(0xFFFBCFE8), Color(0xFF9D174D)),
+    Emotion(3, "Admiración", "Respeto y aprecio hacia alguien...", Color(0xFFE9D5FF), Color(0xFF581C87)),
+    Emotion(4, "Agradecimiento", "Reconocimiento y apreciación por lo que tenemos...", Color(0xFFD1FAE5), Color(0xFF065F46)),
+    Emotion(5, "Aprecio", "Reconocimiento del valor y la importancia...", Color(0xFFDBEAFE), Color(0xFF1E40AF)),
+    Emotion(6, "Calma", "Estado de tranquilidad y serenidad...", Color(0xFFCFFAFE), Color(0xFF155E75)),
+    Emotion(7, "Confianza", "Sensación de seguridad en uno mismo...", Color(0xFFE0E7FF), Color(0xFF312E81)),
+    Emotion(8, "Curiosidad", "Deseo de aprender, explorar y descubrir...", Color(0xFFFFEDD5), Color(0xFF9A3412)),
+    Emotion(9, "Entusiasmo", "Emoción intensa de interés y emoción...", Color(0xFFFEE2E2), Color(0xFF991B1B)),
+    Emotion(10, "Esperanza", "Creencia positiva en posibilidades futuras...", Color(0xFFCCFBF1), Color(0xFF134E4A)),
+    Emotion(11, "Satisfacción", "Sensación de plenitud y contentamiento...", Color(0xFFECFCCB), Color(0xFF3F6212)),
+    Emotion(12, "Placer", "Sensación agradable derivada de experiencias...", Color(0xFFFFE4E6), Color(0xFF881337)),
+    Emotion(13, "Euforia", "Estado de felicidad intensa y energía elevada...", Color(0xFFF0ABFC), Color(0xFF701A75)),
+    Emotion(14, "Deseo", "Anhelo fuerte hacia algo específico...", Color(0xFFDDD6FE), Color(0xFF4C1D95)),
+    Emotion(15, "Ilusión", "Expectativa positiva y emocionante...", Color(0xFFE0F2FE), Color(0xFF0C4A6E)),
+    Emotion(16, "Orgullo", "Satisfacción por logros propios...", Color(0xFFFEF3C7), Color(0xFF92400E)),
+    Emotion(17, "Vergüenza", "Sentimiento de incomodidad sobre uno mismo...", Color(0xFFFECACA), Color(0xFF7F1D1D)),
+    Emotion(18, "Culpa", "Remordimiento por acciones que causaron daño...", Color(0xFFD1D5DB), Color(0xFF111827)),
+    Emotion(19, "Envidia", "Resentimiento hacia lo que otros poseen...", Color(0xFFBBF7D0), Color(0xFF14532D)),
+    Emotion(20, "Celos", "Miedo a perder algo valioso...", Color(0xFFFDE047), Color(0xFF713F12)),
+    Emotion(21, "Ira", "Respuesta emocional intensa ante una injusticia...", Color(0xFFF87171), Color(0xFF7F1D1D)),
+    Emotion(22, "Odio", "Aversión intensa y duradera...", Color(0xFF94A3B8), Color(0xFF0F172A)),
+    Emotion(23, "Desprecio", "Sensación de superioridad y falta de respeto...", Color(0xFFA8A29E), Color(0xFF1C1917)),
+    Emotion(24, "Aburrimiento", "Falta de interés o estimulación...", Color(0xFFE5E5E5), Color(0xFF171717)),
+    Emotion(25, "Soledad", "Sensación de aislamiento y falta de conexión...", Color(0xFFBFDBFE), Color(0xFF1E3A8A)),
+    Emotion(26, "Tristeza", "Respuesta natural a la pérdida...", Color(0xFFC7D2FE), Color(0xFF312E81)),
+    Emotion(27, "Miedo", "Respuesta de supervivencia ante una amenaza...", Color(0xFFE9D5FF), Color(0xFF581C87)),
+    Emotion(28, "Ansiedad", "Preocupación excesiva sobre eventos futuros...", Color(0xFFFED7AA), Color(0xFF7C2D12)),
+    Emotion(29, "Dolor", "Sufrimiento emocional profundo...", Color(0xFF9CA3AF), Color(0xFF111827)),
+    Emotion(30, "Desconsuelo", "Pena profunda sin posibilidad aparente de consuelo...", Color(0xFFD1D5DB), Color(0xFF1F2937)),
+    Emotion(31, "Decepción", "Tristeza cuando las expectativas no se cumplen...", Color(0xFFD4D4D8), Color(0xFF18181B)),
+    Emotion(32, "Frustración", "Irritación cuando algo impide alcanzar un objetivo...", Color(0xFFF9A8D4), Color(0xFF831843)),
+    Emotion(33, "Impotencia", "Sensación de no poder cambiar o controlar...", Color(0xFFA7F3D0), Color(0xFF047857)),
+    Emotion(34, "Inseguridad", "Falta de confianza en uno mismo...", Color(0xFF99F6E4), Color(0xFF0F766E)),
+    Emotion(35, "Nostalgia", "Anhelo sentimental por el pasado...", Color(0xFFBAE6FD), Color(0xFF075985)),
+    Emotion(36, "Serenidad", "Estado de paz interior profunda...", Color(0xFFDBEAFE), Color(0xFF1E40AF)),
+    Emotion(37, "Compasión", "Empatía profunda combinada con deseo de ayudar...", Color(0xFFFCE7F3), Color(0xFF9D174D)),
+    Emotion(38, "Empatía", "Capacidad de sentir y comprender...", Color(0xFFF5D0FE), Color(0xFF701A75)),
+    Emotion(39, "Comprensión", "Claridad mental sobre una situación...", Color(0xFFE0E7FF), Color(0xFF312E81)),
+    Emotion(40, "Perdón", "Liberación del resentimiento...", Color(0xFFD1FAE5), Color(0xFF065F46)),
+    Emotion(41, "Libertad", "Sensación de autonomía y capacidad de elegir...", Color(0xFFE0F2FE), Color(0xFF0C4A6E)),
+    Emotion(42, "Felicidad", "Estado general de bienestar y satisfacción...", Color(0xFFFEF9C3), Color(0xFF713F12))
+)

@@ -17,14 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.duocuc.serena.Graph
+import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.navigation.Route
+import com.duocuc.serena.viewmodel.SessionViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
@@ -95,9 +98,13 @@ private val drawerItems = listOf(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeAppScreen(nav: NavController) {
+fun HomeAppScreen(
+    nav: NavController,
+    sessionViewModel: SessionViewModel = viewModel(factory = ViewModelFactory())
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val activeUser by sessionViewModel.activeUser.collectAsState()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -140,7 +147,12 @@ fun HomeAppScreen(nav: NavController) {
                     icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cerrar sesión") },
                     label = { Text("Cerrar sesión") },
                     selected = false,
-                    onClick = { nav.navigate(Route.Logout.path) },
+                    onClick = { 
+                        sessionViewModel.logout()
+                        nav.navigate(Route.Login.path) {
+                            popUpTo(Route.Home.path) { inclusive = true }
+                        }
+                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
@@ -159,7 +171,7 @@ fun HomeAppScreen(nav: NavController) {
                     title = {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Serena 🌿",
+                                text = "Bienvenido, ${activeUser?.userName ?: "Usuario"}",
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onBackground
@@ -345,15 +357,8 @@ fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
                 color = if (isSelected)
                     MaterialTheme.colorScheme.onPrimary
                 else
-                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f)
             )
         }
     }
 }
-
-
-
-
-
-

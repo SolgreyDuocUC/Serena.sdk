@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.R
+import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.viewmodel.RegisterViewModel
 import com.duocuc.serena.model.UserUiState
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ import kotlinx.coroutines.launch
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    registerViewModel: RegisterViewModel = viewModel()
+    registerViewModel: RegisterViewModel = viewModel(factory = ViewModelFactory())
 ) {
     val uiState: UserUiState by registerViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -64,7 +65,6 @@ fun RegisterScreen(
                     uiState = uiState,
                     viewModel = registerViewModel,
                     onNavigateToLogin = onNavigateToLogin,
-                    // Pasamos la función de éxito para el flujo de Google
                     onGoogleSuccess = onRegisterSuccess
                 )
             }
@@ -77,7 +77,7 @@ private fun RegistroFormulario(
     uiState: UserUiState,
     viewModel: RegisterViewModel,
     onNavigateToLogin: () -> Unit,
-    onGoogleSuccess: () -> Unit // Nueva función para la navegación de Google
+    onGoogleSuccess: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,7 +88,6 @@ private fun RegistroFormulario(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- Campos de formulario omitidos para brevedad ---
         OutlinedTextField(
             value = uiState.userName,
             onValueChange = viewModel::onUserNameChange,
@@ -187,7 +186,6 @@ private fun RegistroFormulario(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- Botón de Registro Clásico ---
         Button(
             onClick = viewModel::register,
             modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -221,7 +219,6 @@ private fun RegistroFormulario(
         ) {
             Spacer(modifier = Modifier.width(12.dp))
             Image(
-                // Nota: Asumiendo que R.drawable.ic_google es el recurso correcto
                 painter = painterResource(id = R.mipmap.ic_google_launcher_foreground),
                 contentDescription = "Logo de Google",
                 modifier = Modifier.size(24.dp)
