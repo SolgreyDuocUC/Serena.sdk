@@ -1,10 +1,11 @@
 package com.duocuc.serena.repository
 
-import com.duocuc.serena.DAO.UserDAO
+import com.duocuc.serena.dao.UserDAO
 import com.duocuc.serena.data.UserData
 import com.duocuc.serena.data.UserActiveSession
-import com.duocuc.serena.DAO.UserSessionDao
+import com.duocuc.serena.dao.UserSessionDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -15,6 +16,7 @@ class UserRepository(
     private val userSessionDao: UserSessionDao
 ) {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val activeUser: Flow<UserData?> = userSessionDao.getActiveSessionFlow().flatMapLatest { session ->
         if (session != null) {
             userDAO.findUserByIdFlow(session.activeUserId)

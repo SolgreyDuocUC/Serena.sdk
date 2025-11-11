@@ -1,6 +1,6 @@
 package com.duocuc.serena.repository
 
-import com.duocuc.serena.DAO.RegistroEmocionalDao
+import com.duocuc.serena.dao.RegistroEmocionalDao
 import com.duocuc.serena.data.EmotionalRegisterData
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
