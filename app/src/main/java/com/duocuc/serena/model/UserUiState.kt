@@ -7,13 +7,17 @@ data class UserUiState(
     val userRepeatPassword: String = "",
     val userAcceptConditions: Boolean = false,
     val userNameError: String? = null,
+    val userLastNameError: String? = null,
+    val userAgeError: String? = null,
     val userEmailError: String? = null,
     val userPasswordError: String? = null,
     val userRepeatPasswordError: String? = null,
     val userAcceptConditionsError: String? = null,
     val isLoading: Boolean = false,
     val isRegistrationSuccessful: Boolean = false,
-    val registrationError: String? = null
+    val registrationError: String? = null,
+    val userLastName: String,
+    val userAge: String
 ) {
     val isFormValid: Boolean
         get() = userNameError == null &&

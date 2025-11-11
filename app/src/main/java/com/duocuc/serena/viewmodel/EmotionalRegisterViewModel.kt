@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duocuc.serena.data.EmotionalRegisterData
 import com.duocuc.serena.repository.EmotionalRegisterRepository
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,9 +18,9 @@ class EmotionalRegisterViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
 
-    fun registerEmotion(idEmocion: Int, fecha: LocalDate) {
+    fun registerEmotion(idEmocion: Int) {
         viewModelScope.launch {
-            val result = repository.registerEmotion(idEmocion, fecha)
+            val result = repository.registerEmotion(idEmocion)
             result.onSuccess {
                 loadRegisters()
             }.onFailure { e ->
