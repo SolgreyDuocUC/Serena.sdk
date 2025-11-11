@@ -47,5 +47,3 @@ val emotionsList = listOf(
     Emotion(41, "Libertad", "Sensación de autonomía y capacidad de elegir...", Color(0xFFE0F2FE), Color(0xFF0C4A6E)),
     Emotion(42, "Felicidad", "Estado general de bienestar y satisfacción...", Color(0xFFFEF9C3), Color(0xFF713F12))
 )
-
-//Version Oficial

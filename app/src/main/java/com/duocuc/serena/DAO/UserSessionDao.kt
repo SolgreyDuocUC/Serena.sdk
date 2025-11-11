@@ -1,4 +1,4 @@
-package com.duocuc.serena.dao
+package com.duocuc.serena.DAO
 
 import androidx.room.Dao
 import androidx.room.Insert

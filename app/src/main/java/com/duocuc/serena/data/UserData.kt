@@ -4,20 +4,16 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "usuarios")
+@Entity("usuarios")
 data class UserData(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-
     @ColumnInfo(name = "nombreUsuario")
     val userName: String?,
-
     @ColumnInfo(name = "emailUsuario")
     val userEmail: String,
-
-    @ColumnInfo(name = "contraseniaUsuario") // corregido: “contraseña”
+    @ColumnInfo(name = "contrseniaUsuario")
     val userPassword: String,
-
-    @ColumnInfo(name = "usuarioCondiciones") // corregido: “usuario”
+    @ColumnInfo(name = "usuarioCondiciones")
     val userAceptConditions: Boolean = true
 )

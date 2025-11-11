@@ -11,28 +11,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-    private val userRepository: UserRepository = UserRepository()
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(UserUiState(
-        userName = TODO(),
-        userEmail = TODO(),
-        userPassword = TODO(),
-        userRepeatPassword = TODO(),
-        userAcceptConditions = TODO(),
-        userNameError = TODO(),
-        userLastNameError = TODO(),
-        userAgeError = TODO(),
-        userEmailError = TODO(),
-        userPasswordError = TODO(),
-        userRepeatPasswordError = TODO(),
-        userAcceptConditionsError = TODO(),
-        isLoading = TODO(),
-        isRegistrationSuccessful = TODO(),
-        registrationError = TODO(),
-        userLastName = TODO(),
-        userAge = TODO()
-    ))
+    private val _uiState = MutableStateFlow(UserUiState())
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
 
     fun onUserNameChange(newUserName: String) {
@@ -40,34 +22,6 @@ class RegisterViewModel(
             currentState.copy(
                 userName = newUserName,
                 userNameError = if (newUserName.length >= 3) null else "El nombre debe tener al menos 3 caracteres"
-            )
-        }
-    }
-
-    fun onUserLastNameChange(newLastName: String) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                userLastNameError = if (newLastName.length >= 3) null else "El apellido debe tener al menos 3 caracteres",
-                userLastName = newLastName
-            )
-        }
-    }
-
-    fun onUserAgeChange(newAge: String) {
-        val ageError = try {
-            val age = newAge.toInt()
-            when {
-                age < 18 -> "Debes ser mayor de 18 años"
-                age > 120 -> "Edad no válida"
-                else -> null
-            }
-        } catch (e: NumberFormatException) {
-            "La edad debe ser un número válido"
-        }
-        _uiState.update { currentState ->
-            currentState.copy(
-                userAge = newAge,
-                userAgeError = if (newAge.isEmpty()) "La edad no puede estar vacía" else ageError
             )
         }
     }
@@ -121,31 +75,22 @@ class RegisterViewModel(
 
     private fun validateAllFields(currentState: UserUiState): UserUiState {
         val nameError = if (currentState.userName.length >= 3) null else "El nombre debe tener al menos 3 caracteres"
-        val lastNameError = if (currentState.userLastName.length >= 3) null else "El apellido debe tener al menos 3 caracteres"
-        val ageError = try {
-            val age = currentState.userAge.toInt()
-            when {
-                currentState.userAge.isEmpty() -> "La edad no puede estar vacía"
-                age < 18 -> "Debes ser mayor de 18 años"
-                age > 120 -> "Edad no válida"
-                else -> null
-            }
-        } catch (e: NumberFormatException) {
-            "La edad debe ser un número válido"
-        }
+
         val emailRegex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
         val emailError = if (currentState.userEmail.matches(emailRegex.toRegex())) null else "Formato de email no válido"
+
         val passwordError = when {
             currentState.userPassword.length < 8 -> "La contraseña debe tener al menos 8 caracteres"
             !currentState.userPassword.any { it.isDigit() } -> "Debe contener al menos un número"
             else -> null
         }
+
         val repeatPasswordError = if (currentState.userRepeatPassword == currentState.userPassword && currentState.userRepeatPassword.isNotEmpty()) null else "Las contraseñas no coinciden"
+
         val conditionsError = if (currentState.userAcceptConditions) null else "Debe aceptar las condiciones"
+
         return currentState.copy(
             userNameError = nameError,
-            userLastNameError = lastNameError,
-            userAgeError = ageError,
             userEmailError = emailError,
             userPasswordError = passwordError,
             userRepeatPasswordError = repeatPasswordError,
@@ -157,27 +102,40 @@ class RegisterViewModel(
         _uiState.update { currentState ->
             validateAllFields(currentState)
         }
+
         val state = _uiState.value
+
         if (!state.isFormValid) {
             return
         }
-        _uiState.update { it.copy(isLoading = true) }
+
+        _uiState.update { it.copy(isLoading = true, registrationError = null) }
+
         viewModelScope.launch {
             try {
                 val result = userRepository.registerUser(
                     email = state.userEmail,
                     password = state.userPassword,
                     name = state.userName,
-                    lastName = state.userLastName,
-                    age = state.userAge
                 )
+
                 if (result.isSuccess) {
-                    _uiState.update { it.copy(isRegistrationSuccessful = true) }
+                    _uiState.update { it.copy(
+                        isRegistrationSuccessful = true,
+                        isLoading = false
+                    )}
                 } else {
-                    _uiState.update { it.copy(registrationError = result.exceptionOrNull()?.message ?: "Error desconocido en el registro.") }
+                    _uiState.update { it.copy(
+                        registrationError = result.exceptionOrNull()?.message ?: "Error desconocido en el registro.",
+                        isLoading = false
+                    )}
                 }
+
             } catch (e: Exception) {
-                _uiState.update { it.copy(registrationError = e.message ?: "Error de red o conexión.") }
+                _uiState.update { it.copy(
+                    registrationError = e.message ?: "Error de red o conexión.",
+                    isLoading = false
+                )}
             }
         }
     }

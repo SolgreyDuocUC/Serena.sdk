@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.R
+import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.model.LoginUiState
 import com.duocuc.serena.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
@@ -29,15 +30,12 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    // 1. Inyectamos el ViewModel
-    loginViewModel: LoginViewModel = viewModel()
+    loginViewModel: LoginViewModel = viewModel(factory = ViewModelFactory())
 ) {
-    // 2. Consumimos el UiState del ViewModel (MVVM)
     val uiState: LoginUiState by loginViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // 3. Manejo de Efectos Laterales (Navegación y Snackbar)
     LaunchedEffect(key1 = uiState.isLoginSuccessful, key2 = uiState.loginError) {
         if (uiState.isLoginSuccessful) {
             onLoginSuccess()
@@ -102,7 +100,6 @@ private fun LoginFormulario(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Campo Correo (Consume estado y error del ViewModel - RF-02) ---
             OutlinedTextField(
                 value = uiState.userEmail,
                 onValueChange = viewModel::onUserEmailChange,
@@ -119,7 +116,6 @@ private fun LoginFormulario(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- Campo Contraseña (Consume estado y error del ViewModel - RF-02) ---
             OutlinedTextField(
                 value = uiState.userPassword,
                 onValueChange = viewModel::onUserPasswordChange,
@@ -137,11 +133,9 @@ private fun LoginFormulario(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Botón Login ---
             Button(
                 onClick = viewModel::login, // Llama a la lógica centralizada
                 modifier = Modifier.fillMaxWidth(),
-                // Clave: Deshabilitado si la validación falla (RF-03)
                 enabled = uiState.isFormValid && !uiState.isLoading
             ) {
                 Text("Iniciar sesión")
@@ -149,7 +143,6 @@ private fun LoginFormulario(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Botón estilizado de Google ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

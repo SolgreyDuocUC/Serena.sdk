@@ -1,31 +1,43 @@
-package com.duocuc.serena.dao
+package com.duocuc.serena.DAO
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.duocuc.serena.data.UserData
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDAO {
 
-    // Crear usuario (CREATE)
-    @Insert
-    suspend fun insertUser(user: UserData)
+    //CRUD interacción
 
-    // Obtener todos los usuarios (READ)
+    //Listar todos los usuarios (READ)
     @Query("SELECT * FROM usuarios")
-    suspend fun getAllUsers(): List<UserData>
+    fun getAll(): List<UserData>
 
-    // Buscar por IDs (READ)
+    //Buscar por ID
     @Query("SELECT * FROM usuarios WHERE id IN (:userIds)")
-    suspend fun loadAllByIds(userIds: IntArray): List<UserData>
+    fun loadAllByIds(userIds: IntArray): List<UserData>
 
-    // Eliminar usuario (DELETE)
+    @Query("SELECT * FROM usuarios WHERE id = :userId")
+    fun findUserByIdFlow(userId: Int): Flow<UserData?>
+
+    @Query("SELECT * FROM usuarios WHERE emailUsuario = :email LIMIT 1")
+    fun findByEmail(email: String): UserData?
+
+    @Query("SELECT * FROM usuarios WHERE emailUsuario = :email AND contrseniaUsuario = :password LIMIT 1")
+    fun findByEmailAndPassword(email: String, password: String): UserData?
+
+    @Insert
+    fun insertAll(vararg users: UserData)
+
+    @Update
+    suspend fun updateUser(user: UserData)
+
     @Delete
-    suspend fun deleteUser(user: UserData)
+    fun delete(user: UserData)
 
-    // Verificar login (opcional, pero muy útil)
-    @Query("SELECT * FROM usuarios WHERE emailUsuario = :email AND contraseniaUsuario = :password LIMIT 1")
-    suspend fun getUserByCredentials(email: String, password: String): UserData?
+
 }

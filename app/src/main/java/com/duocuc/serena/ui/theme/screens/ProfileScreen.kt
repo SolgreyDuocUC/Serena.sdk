@@ -26,7 +26,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.duocuc.serena.factory.ViewModelFactory
+import com.duocuc.serena.model.ProfileUiState
 import com.duocuc.serena.viewmodel.ProfileViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,20 +38,24 @@ import java.util.*
 @Composable
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
-    profileViewModel: ProfileViewModel = viewModel()
+    profileViewModel: ProfileViewModel = viewModel(factory = ViewModelFactory())
 ) {
     val context = LocalContext.current
-    val name by profileViewModel.name
-    val email by profileViewModel.email
-    val oldPassword by profileViewModel.oldPassword
-    val newPassword by profileViewModel.newPassword
-    val imageUri by profileViewModel.imageUri
+    val uiState by profileViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     var showDialog by remember { mutableStateOf(false) }
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
-    var showSnackbar by remember { mutableStateOf(false) }
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(it)
+                profileViewModel.clearSnackbar()
+            }
+        }
+    }
 
     fun createTempUri(): Uri {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -61,12 +68,16 @@ fun ProfileScreen(
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
-        onResult = { success -> if (success) profileViewModel.updateImage(tempImageUri) }
+        onResult = { success ->
+//            if (success) profileViewModel.updateImage(tempImageUri)
+        }
     )
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri -> profileViewModel.updateImage(uri) }
+        onResult = { uri ->
+//            profileViewModel.updateImage(uri)
+        }
     )
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -136,74 +147,79 @@ fun ProfileScreen(
                     .background(Color(0xFFE0E0E0))
                     .clickable { showDialog = true }
             ) {
-                if (imageUri != null) {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier.size(130.dp).clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "Agregar foto",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
+//                if (imageUri != null) {
+//                    AsyncImage(
+//                        model = imageUri,
+//                        contentDescription = "Foto de perfil",
+//                        modifier = Modifier.size(130.dp).clip(CircleShape),
+//                        contentScale = ContentScale.Crop
+//                    )
+//                } else {
+                Icon(
+                    imageVector = Icons.Default.AddAPhoto,
+                    contentDescription = "Agregar foto",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(48.dp)
+                )
+//                }
             }
 
             Text("Toca la imagen para cambiarla", color = Color.Gray)
 
             OutlinedTextField(
-                value = name,
-                onValueChange = profileViewModel::updateName,
+                value = uiState.name,
+                onValueChange = profileViewModel::onNameChange,
                 label = { Text("Nombre") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = uiState.errorMessage?.contains("nombre", ignoreCase = true) == true
             )
 
             OutlinedTextField(
-                value = email,
-                onValueChange = profileViewModel::updateEmail,
+                value = uiState.email,
+                onValueChange = profileViewModel::onEmailChange,
                 label = { Text("Correo Electrónico") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = uiState.errorMessage?.contains("email", ignoreCase = true) == true
             )
 
             OutlinedTextField(
-                value = oldPassword,
-                onValueChange = profileViewModel::updateOldPassword,
+                value = uiState.oldPassword,
+                onValueChange = profileViewModel::onOldPasswordChange,
                 label = { Text("Contraseña actual") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = uiState.errorMessage?.contains("contraseña", ignoreCase = true) == true
             )
 
             OutlinedTextField(
-                value = newPassword,
-                onValueChange = profileViewModel::updateNewPassword,
+                value = uiState.newPassword,
+                onValueChange = profileViewModel::onNewPasswordChange,
                 label = { Text("Nueva contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (uiState.errorMessage != null) {
+                Text(
+                    text = uiState.errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = {
-                    profileViewModel.saveProfileChanges()
-                    showSnackbar = true
-                },
-                modifier = Modifier.fillMaxWidth().height(50.dp)
+                onClick = profileViewModel::saveChanges,
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                enabled = !uiState.isLoading
             ) {
-                Text("Guardar Cambios")
-            }
-
-            if (showSnackbar) {
-                LaunchedEffect(Unit) {
-                    snackbarHostState.showSnackbar("Cambios guardados correctamente")
-                    showSnackbar = false
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(color = Color.White)
+                } else {
+                    Text("Guardar Cambios")
                 }
             }
         }
     }
 }
-
