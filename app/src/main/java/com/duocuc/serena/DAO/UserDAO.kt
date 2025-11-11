@@ -1,4 +1,4 @@
-package com.duocuc.serena.DAO
+package com.duocuc.serena.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
