@@ -15,7 +15,7 @@ sealed class Route(val path: String) {
     object About : Route("about")
     object Logout : Route("logout")
 
-    object EmotionalRegistered : Route(path="emotional_registered")
+    object EmotionalRegistered : Route("emotional_registered")
 }
 
 

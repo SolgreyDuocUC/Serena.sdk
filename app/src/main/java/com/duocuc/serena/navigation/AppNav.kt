@@ -54,11 +54,13 @@ fun AppNav() {
         }
 
         composable(Route.Calendar.path) { /* Placeholder */ }
-        composable(Route.Journal.path) { /* Placeholder */ }
         composable(Route.MessageOfDay.path) { /* Placeholder */ }
         composable(Route.LearningPath.path) { LearningPathScreen(navController = navController) }
 
-        // Perfil conectado
+        composable(Route.EmotionalRegistered.path) {
+            EmotionalRegisteredScreen()
+        }
+
         composable(Route.Profile.path) {
             ProfileScreen(onNavigateBack = { navController.popBackStack() })
         }
@@ -67,8 +69,6 @@ fun AppNav() {
         composable(Route.Logout.path) { /* Placeholder */ }
         composable(Route.Help.path) { /* Placeholder */ }
         composable(Route.About.path) { /* Placeholder */ }
-
-        composable(Route.EmotionalRegistered.path){ EmotionalRegisteredScreen()}
-
     }
 }
+

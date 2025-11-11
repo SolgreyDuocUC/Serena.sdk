@@ -39,7 +39,9 @@ fun CalendarScreen(navController: NavController, onNavigateBack: () -> Boolean) 
                 shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                CalendarContent()
+                CalendarContent(
+                    navController = TODO()
+                )
             }
         }
     }

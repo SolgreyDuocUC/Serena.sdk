@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +23,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.duocuc.serena.Graph
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.navigation.Route
 import com.duocuc.serena.viewmodel.SessionViewModel
@@ -34,7 +32,7 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
-// ------------------------- BOTTOM NAVIGATION ------------------------
+// ------------------------- BOTTOM NAV ------------------------
 
 data class BottomNavItem(
     val route: Route,
@@ -43,15 +41,15 @@ data class BottomNavItem(
 )
 
 private val bottomNavItems = listOf(
-    BottomNavItem(Route.Home, Icons.Filled.FavoriteBorder, "Diario"),
+    BottomNavItem(Route.EmotionalRegistered, Icons.Filled.FavoriteBorder, "Diario"),
     BottomNavItem(Route.Calendar, Icons.Filled.CalendarToday, "Calendario"),
-    BottomNavItem(Route.Profile, Icons.Filled.AccountCircle, "Usuario"), // ✅ cambia a Perfil real
+    BottomNavItem(Route.Profile, Icons.Filled.AccountCircle, "Usuario"),
     BottomNavItem(Route.LearningPath, Icons.Filled.School, "Aprendizaje")
 )
 
 @Composable
 fun BottomNavBar(navController: NavController) {
-    var selectedItem by remember { mutableStateOf(Route.Calendar.path) }
+    var selectedItem by remember { mutableStateOf(navController.currentBackStackEntry?.destination?.route ?: Route.EmotionalRegistered.path) }
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -79,21 +77,16 @@ fun BottomNavBar(navController: NavController) {
     }
 }
 
-// ------------------------- DRAWER ITEMS ------------------------
+// ------------------------- DRAWER ------------------------
 
-data class DrawerItem(
-    val label: String,
-    val icon: ImageVector
-)
+data class DrawerItem(val label: String, val icon: ImageVector)
 
 private val drawerItems = listOf(
     DrawerItem("Ver registro emocional", Icons.Filled.Book),
     DrawerItem("Leer mensaje del día", Icons.Filled.WbSunny),
     DrawerItem("Ruta de aprendizaje emocional", Icons.Filled.School),
-    DrawerItem("Configuración de usuario", Icons.Filled.Settings), // ✅ abre el perfil real
+    DrawerItem("Configuración de usuario", Icons.Filled.Settings)
 )
-
-// ------------------------- HOME SCREEN ------------------------
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,7 +107,6 @@ fun HomeAppScreen(
                 drawerTonalElevation = 4.dp
             ) {
                 Spacer(Modifier.height(24.dp))
-
                 Text(
                     text = "Menú principal",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
@@ -128,8 +120,8 @@ fun HomeAppScreen(
                         selected = false,
                         onClick = {
                             when (item.label) {
-                                "Configuración de usuario" -> nav.navigate(Route.Profile.path) // ✅ ahora abre el perfil
-                                "Ver registro emocional" -> nav.navigate(Route.Journal.path)
+                                "Configuración de usuario" -> nav.navigate(Route.Profile.path)
+                                "Ver registro emocional" -> nav.navigate(Route.EmotionalRegistered.path)
                                 "Leer mensaje del día" -> nav.navigate(Route.MessageOfDay.path)
                                 "Ruta de aprendizaje emocional" -> nav.navigate(Route.LearningPath.path)
                             }
@@ -147,12 +139,12 @@ fun HomeAppScreen(
                     icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cerrar sesión") },
                     label = { Text("Cerrar sesión") },
                     selected = false,
-                    onClick = { 
+                    onClick = {
                         sessionViewModel.logout()
                         nav.navigate(Route.Login.path) {
                             popUpTo(Route.Home.path) { inclusive = true }
                         }
-                     },
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
@@ -162,9 +154,7 @@ fun HomeAppScreen(
             topBar = {
                 CenterAlignedTopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = {
-                            coroutineScope.launch { drawerState.open() }
-                        }) {
+                        IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
                             Icon(Icons.Filled.Menu, contentDescription = "Menú")
                         }
                     },
@@ -227,24 +217,13 @@ fun HomeAppScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    CalendarContent()
+                    CalendarContent(nav)
                 }
             }
         }
     }
-}
-
-// ------------------------- REGISTRO EMOCIONAL ------------------------
-
-@Suppress("DEPRECATION")
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun EmotionalRegisteredScreen(){
-
 }
 
 // ------------------------- CALENDARIO ------------------------
@@ -252,7 +231,7 @@ fun EmotionalRegisteredScreen(){
 @Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarContent() {
+fun CalendarContent(navController: NavController) {
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val today = LocalDate.now()
     val daysOfWeek = listOf("Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb")
@@ -327,7 +306,10 @@ fun CalendarContent() {
                         row.forEach { day ->
                             val date = day?.let { currentMonth.atDay(it) }
                             val isToday = date == today
-                            DayCellAlternative(day, isToday, dayCellSize)
+                            DayCellAlternative(day, isToday, dayCellSize) {
+                                // Navega al registro emocional al tocar un día
+                                navController.navigate(Route.EmotionalRegistered.path)
+                            }
                         }
                     }
                 }
@@ -336,19 +318,17 @@ fun CalendarContent() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp) {
+fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp, onClick: (LocalDate) -> Unit) {
     Box(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(
-                when {
-                    isSelected -> MaterialTheme.colorScheme.primary
-                    else -> Color.Transparent
-                }
-            )
-            .clickable(enabled = day != null) { },
+            .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+            .clickable(enabled = day != null) {
+                day?.let { onClick(LocalDate.now().withDayOfMonth(it)) }
+            },
         contentAlignment = Alignment.Center
     ) {
         if (day != null) {
