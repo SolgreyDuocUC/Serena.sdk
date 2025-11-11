@@ -5,12 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.duocuc.serena.dao.RegistroEmocionalDao
 import com.duocuc.serena.dao.UserDAO
+import com.duocuc.serena.dao.UserSessionDao
 import com.duocuc.serena.data.UserData
 import com.duocuc.serena.data.UserActiveSession
-import com.duocuc.serena.dao.UserSessionDao
 import com.duocuc.serena.data.EmotionalRegisterData
-import com.duocuc.serena.dao.RegistroEmocionalDao
 
 @Database(
     entities = [UserData::class, UserActiveSession::class, EmotionalRegisterData::class],
