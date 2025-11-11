@@ -7,7 +7,7 @@ import androidx.room.Query
 import com.duocuc.serena.data.EmotionalRegisterData
 
 @Dao
-interface EmotionalRegisterDao {
+interface RegistroEmocionalDao {
 
     @Insert
     suspend fun insertEmotion(register: EmotionalRegisterData)
