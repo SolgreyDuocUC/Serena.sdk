@@ -12,6 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,15 +39,17 @@ fun EmotionalRegisteredScreen(
     val error by viewModel.error.collectAsState()
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
     var showDialog by remember { mutableStateOf(false) }
+    var selectedRegister by remember { mutableStateOf<EmotionalRegisterData?>(null) }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadRegisters()
-    }
+    LaunchedEffect(Unit) { viewModel.loadRegisters() }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showDialog = true },
+                onClick = {
+                    selectedRegister = null
+                    showDialog = true
+                },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Agregar emoción", tint = MaterialTheme.colorScheme.onPrimary)
@@ -98,14 +102,14 @@ fun EmotionalRegisteredScreen(
                             ),
                             textAlign = TextAlign.Center
                         )
-
                         Button(
-                            onClick = { showDialog = true },
+                            onClick = {
+                                selectedRegister = null
+                                showDialog = true
+                            },
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.height(48.dp)
-                        ) {
-                            Text("Agregar primera emoción")
-                        }
+                        ) { Text("Agregar primera emoción") }
                     }
                 }
             } else {
@@ -116,7 +120,15 @@ fun EmotionalRegisteredScreen(
                         .padding(top = 8.dp)
                 ) {
                     items(registers) { register ->
-                        EmotionCard(register, formatter)
+                        EmotionCard(
+                            register = register,
+                            formatter = formatter,
+                            onEdit = {
+                                selectedRegister = register
+                                showDialog = true
+                            },
+                            onDelete = { viewModel.deleteEmotion(register.id) }
+                        )
                     }
                     item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
@@ -125,13 +137,15 @@ fun EmotionalRegisteredScreen(
 
         if (showDialog) {
             EmotionDialog(
+                register = selectedRegister,
                 onDismiss = { showDialog = false },
-                onSave = { selectedEmotionId ->
-                    if (selectedEmotionId != null) {
-                        viewModel.registerEmotion(
-                            idEmocion = selectedEmotionId,
-                            fecha = LocalDate.now()
-                        )
+                onSave = { emotionId ->
+                    emotionId?.let {
+                        if (selectedRegister == null) {
+                            viewModel.registerEmotion(it, LocalDate.now())
+                        } else {
+                            viewModel.updateEmotion(selectedRegister!!.id, it, LocalDate.now())
+                        }
                     }
                     showDialog = false
                 }
@@ -142,10 +156,11 @@ fun EmotionalRegisteredScreen(
 
 @Composable
 fun EmotionDialog(
+    register: EmotionalRegisterData?,
     onDismiss: () -> Unit,
     onSave: (Int?) -> Unit
 ) {
-    var selectedEmotion by remember { mutableStateOf<Int?>(null) }
+    var selectedEmotion by remember { mutableStateOf(register?.idEmocion) }
 
     val emotions = listOf(
         1 to "Feliz 😊",
@@ -165,7 +180,7 @@ fun EmotionDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Selecciona tu emoción de hoy",
+                    text = if (register == null) "Selecciona tu emoción de hoy" else "Actualiza tu emoción",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
@@ -205,9 +220,7 @@ fun EmotionDialog(
                     Button(
                         onClick = { onSave(selectedEmotion) },
                         enabled = selectedEmotion != null
-                    ) {
-                        Text("Guardar")
-                    }
+                    ) { Text("Guardar") }
                 }
             }
         },
@@ -218,7 +231,12 @@ fun EmotionDialog(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun EmotionCard(register: EmotionalRegisterData, formatter: DateTimeFormatter) {
+fun EmotionCard(
+    register: EmotionalRegisterData,
+    formatter: DateTimeFormatter,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
     val emotionLabel = when (register.idEmocion) {
         1 -> "Feliz 😊"
         2 -> "Triste 😢"
@@ -230,9 +248,7 @@ fun EmotionCard(register: EmotionalRegisterData, formatter: DateTimeFormatter) {
     }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { },
+        modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -256,6 +272,17 @@ fun EmotionCard(register: EmotionalRegisterData, formatter: DateTimeFormatter) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, contentDescription = "Editar") }
+                IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") }
+            }
         }
     }
 }
+
+

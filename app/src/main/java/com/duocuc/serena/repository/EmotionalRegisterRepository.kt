@@ -29,4 +29,32 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
             }
         }
     }
+
+    // EmotionalRegisterRepository.kt
+    suspend fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val register = dao.getRegistersById(id).firstOrNull()
+                    ?: return@withContext Result.failure(Exception("Registro no encontrado"))
+                dao.updateEmotion(register.copy(idEmocion = newIdEmocion, fecha = newFecha))
+                Result.success(true)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun deleteEmotion(id: Int): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val register = dao.getRegistersById(id).firstOrNull()
+                    ?: return@withContext Result.failure(Exception("Registro no encontrado"))
+                dao.deleteEmotion(register)
+                Result.success(true)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 }
+
