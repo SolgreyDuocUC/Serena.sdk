@@ -52,8 +52,7 @@ fun BottomNavBar(navController: NavController) {
     var selectedItem by remember { mutableStateOf(navController.currentBackStackEntry?.destination?.route ?: Route.EmotionalRegistered.path) }
 
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = Modifier.height(80.dp)
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
