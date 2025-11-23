@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout.android)
     implementation(libs.androidx.compose.foundation.layout.android)
     implementation(libs.androidx.compose.foundation.layout.android)
+    implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.ui.graphics)
     kapt("androidx.room:room-compiler:2.6.1")
 
     testImplementation(libs.junit)
