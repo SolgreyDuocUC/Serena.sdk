@@ -39,5 +39,8 @@ interface UserDAO {
     @Delete
     fun delete(user: UserData)
 
+    @Insert
+    fun insert(newUser: UserData)
+
 
 }
