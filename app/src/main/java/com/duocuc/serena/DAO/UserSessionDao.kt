@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.duocuc.serena.data.UserActiveSession
+import com.duocuc.serena.data.dataModel.UserActiveSession
 import kotlinx.coroutines.flow.Flow
 
 @Dao

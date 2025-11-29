@@ -1,8 +1,7 @@
 package com.duocuc.serena.dao
 
 import androidx.room.*
-import com.duocuc.serena.data.EmotionalRegisterData
-import java.time.LocalDate
+import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 
 @Dao
 interface RegistroEmocionalDao {

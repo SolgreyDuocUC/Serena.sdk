@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.duocuc.serena.data.EmotionalRegisterData
+import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.viewmodel.diary.EmotionLogViewModel
 import java.time.LocalDate

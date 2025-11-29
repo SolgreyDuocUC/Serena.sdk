@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.duocuc.serena.data.emotionsList
+import com.duocuc.serena.data.simpleData.emotionsList
 import com.duocuc.serena.model.Emotion
 import com.duocuc.serena.ui.screens.BottomNavBar
 

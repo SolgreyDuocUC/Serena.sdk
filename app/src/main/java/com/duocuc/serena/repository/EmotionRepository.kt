@@ -1,6 +1,6 @@
 package com.duocuc.serena.repository
 
-import com.duocuc.serena.data.emotionsList
+import com.duocuc.serena.data.simpleData.emotionsList
 import com.duocuc.serena.model.Emotion
 
 class EmotionRepository {

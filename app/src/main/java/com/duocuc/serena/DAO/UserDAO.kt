@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.duocuc.serena.data.UserData
+import com.duocuc.serena.data.dataModel.UserData
 import kotlinx.coroutines.flow.Flow
 
 @Dao

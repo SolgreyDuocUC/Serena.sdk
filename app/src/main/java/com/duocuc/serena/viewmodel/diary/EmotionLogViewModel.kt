@@ -2,7 +2,7 @@ package com.duocuc.serena.viewmodel.diary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duocuc.serena.data.EmotionalRegisterData
+import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.repository.EmotionalRegisterRepository
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow

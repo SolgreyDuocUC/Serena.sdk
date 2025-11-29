@@ -2,7 +2,7 @@ package com.duocuc.serena.viewmodel.emotionData
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duocuc.serena.data.EmotionalRegisterData
+import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.repository.EmotionalRegisterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

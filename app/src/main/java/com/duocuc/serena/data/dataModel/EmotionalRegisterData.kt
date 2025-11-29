@@ -1,4 +1,4 @@
-package com.duocuc.serena.data
+package com.duocuc.serena.data.dataModel
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

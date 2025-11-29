@@ -1,4 +1,4 @@
-package com.duocuc.serena.data
+package com.duocuc.serena.data.simpleData
 
 import androidx.compose.ui.graphics.Color
 import com.duocuc.serena.model.Emotion

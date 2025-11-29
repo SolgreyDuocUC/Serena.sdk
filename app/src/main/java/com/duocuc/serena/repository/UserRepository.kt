@@ -1,8 +1,8 @@
 package com.duocuc.serena.repository
 
 import com.duocuc.serena.dao.UserDAO
-import com.duocuc.serena.data.UserData
-import com.duocuc.serena.data.UserActiveSession
+import com.duocuc.serena.data.dataModel.UserData
+import com.duocuc.serena.data.dataModel.UserActiveSession
 import com.duocuc.serena.dao.UserSessionDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
