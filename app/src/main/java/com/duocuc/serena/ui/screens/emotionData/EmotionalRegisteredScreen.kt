@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens.emotionData
+package com.duocuc.serena.ui.screens.emotionData
 
 import android.os.Build
 import androidx.annotation.RequiresApi

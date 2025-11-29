@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens.styleLoadScreen
+package com.duocuc.serena.ui.screens.styleLoadScreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

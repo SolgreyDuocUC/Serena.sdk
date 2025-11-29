@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens.profile
+package com.duocuc.serena.ui.screens.profile
 
 import android.Manifest
 import android.content.pm.PackageManager

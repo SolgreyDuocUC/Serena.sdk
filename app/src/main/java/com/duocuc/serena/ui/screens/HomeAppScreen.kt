@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens
+package com.duocuc.serena.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi

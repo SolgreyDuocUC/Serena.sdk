@@ -12,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.duocuc.serena.ui.theme.screens.*
-import com.duocuc.serena.ui.theme.screens.auth.LoginScreen
-import com.duocuc.serena.ui.theme.screens.auth.RegisterScreen
-import com.duocuc.serena.ui.theme.screens.emotionData.EmotionalRegisteredScreen
-import com.duocuc.serena.ui.theme.screens.learning.LearningPathScreen
-import com.duocuc.serena.ui.theme.screens.profile.ProfileScreen
+import com.duocuc.serena.ui.screens.HomeAppScreen
+import com.duocuc.serena.ui.screens.auth.LoginScreen
+import com.duocuc.serena.ui.screens.auth.RegisterScreen
+import com.duocuc.serena.ui.screens.emotionData.EmotionalRegisteredScreen
+import com.duocuc.serena.ui.screens.learning.LearningPathScreen
+import com.duocuc.serena.ui.screens.profile.ProfileScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens.diary
+package com.duocuc.serena.ui.screens.diary
 
 import android.os.Build
 import androidx.annotation.RequiresApi

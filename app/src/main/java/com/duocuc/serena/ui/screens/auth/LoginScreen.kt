@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens.auth
+package com.duocuc.serena.ui.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

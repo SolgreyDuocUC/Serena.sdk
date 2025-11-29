@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens.diary
+package com.duocuc.serena.ui.screens.diary
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.duocuc.serena.ui.theme.screens.BottomNavBar
-import com.duocuc.serena.ui.theme.screens.CalendarContent
+import com.duocuc.serena.ui.screens.BottomNavBar
+import com.duocuc.serena.ui.screens.CalendarContent
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
