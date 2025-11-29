@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens
+package com.duocuc.serena.ui.theme.screens.profile
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -18,17 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.duocuc.serena.factory.ViewModelFactory
-import com.duocuc.serena.model.ProfileUiState
-import com.duocuc.serena.viewmodel.ProfileViewModel
+import com.duocuc.serena.viewmodel.profile.ProfileViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat

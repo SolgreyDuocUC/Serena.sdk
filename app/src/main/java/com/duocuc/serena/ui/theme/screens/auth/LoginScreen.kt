@@ -23,7 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.R
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.model.LoginUiState
-import com.duocuc.serena.viewmodel.LoginViewModel
+import com.duocuc.serena.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable

@@ -25,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.navigation.Route
-import com.duocuc.serena.viewmodel.SessionViewModel
+import com.duocuc.serena.viewmodel.profile.SessionViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth

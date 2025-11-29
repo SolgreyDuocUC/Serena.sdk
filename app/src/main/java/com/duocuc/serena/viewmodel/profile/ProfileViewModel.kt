@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.duocuc.serena.data.UserData
 import com.duocuc.serena.model.ProfileUiState
 import com.duocuc.serena.repository.UserRepository
-import com.duocuc.serena.viewmodel.SessionViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest

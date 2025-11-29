@@ -3,11 +3,11 @@ package com.duocuc.serena.factory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duocuc.serena.Graph
-import com.duocuc.serena.viewmodel.EmotionalRegisterViewModel
-import com.duocuc.serena.viewmodel.LoginViewModel
-import com.duocuc.serena.viewmodel.ProfileViewModel
-import com.duocuc.serena.viewmodel.RegisterViewModel
-import com.duocuc.serena.viewmodel.SessionViewModel
+import com.duocuc.serena.viewmodel.auth.LoginViewModel
+import com.duocuc.serena.viewmodel.auth.RegisterViewModel
+import com.duocuc.serena.viewmodel.emotionData.EmotionalRegisterViewModel
+import com.duocuc.serena.viewmodel.profile.ProfileViewModel
+import com.duocuc.serena.viewmodel.profile.SessionViewModel
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory : ViewModelProvider.Factory {

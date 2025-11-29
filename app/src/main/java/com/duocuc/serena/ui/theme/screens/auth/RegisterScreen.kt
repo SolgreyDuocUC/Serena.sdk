@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.R
 import com.duocuc.serena.factory.ViewModelFactory
-import com.duocuc.serena.viewmodel.RegisterViewModel
 import com.duocuc.serena.model.UserUiState
+import com.duocuc.serena.viewmodel.auth.RegisterViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
