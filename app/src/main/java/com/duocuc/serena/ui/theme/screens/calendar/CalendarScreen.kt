@@ -1,4 +1,4 @@
-package com.duocuc.serena.ui.theme.screens
+package com.duocuc.serena.ui.theme.screens.calendar
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -9,10 +9,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.duocuc.serena.ui.theme.screens.BottomNavBar
+import java.time.Instant
 
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(navController: NavController, onNavigateBack: () -> Boolean) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = Instant.now().toEpochMilli(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= Instant.now().toEpochMilli()
+            }
+        }
+    )
+
     Scaffold(
         bottomBar = { BottomNavBar(navController = navController) }
     ) { paddingValues ->
@@ -34,15 +46,10 @@ fun CalendarScreen(navController: NavController, onNavigateBack: () -> Boolean) 
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(24.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                CalendarContent(
-                    navController = TODO()
-                )
-            }
+            DatePicker(
+                state = datePickerState,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
