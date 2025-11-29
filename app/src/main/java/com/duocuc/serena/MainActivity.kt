@@ -10,6 +10,14 @@ import androidx.navigation.compose.rememberNavController
 import com.duocuc.serena.navigation.AppNav
 import com.duocuc.serena.ui.theme.theme.SerenaTheme
 
+/*
+Rama para realizar testing:
+
+- Al terminar tests unitarios, debe subir cambios a la rama de dev (desarrollo)
+- No subir cambios directos a main (producción)
+- Si se realizan cambios en la base de datos, avisar al equipo para coordinar migraciones
+- Mantener la rama actualizada con los últimos cambios de dev antes de iniciar nuevas tareas.
+ */
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
