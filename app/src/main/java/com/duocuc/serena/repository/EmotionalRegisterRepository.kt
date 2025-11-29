@@ -30,7 +30,6 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
         }
     }
 
-    // EmotionalRegisterRepository.kt
     suspend fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
@@ -57,4 +56,3 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
         }
     }
 }
-

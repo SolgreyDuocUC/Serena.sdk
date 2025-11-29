@@ -14,7 +14,7 @@ import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 
 @Database(
     entities = [UserData::class, UserActiveSession::class, EmotionalRegisterData::class],
-    version = 3, // Incrementar la versión por el cambio de esquema
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -33,7 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "serena.db"
                 )
-                .fallbackToDestructiveMigration() // Opcional: para evitar crashes en desarrollo
+                .fallbackToDestructiveMigration()
                 .build().also { INSTANCE = it }
             }
     }

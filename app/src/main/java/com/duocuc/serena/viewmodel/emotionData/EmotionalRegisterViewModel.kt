@@ -19,7 +19,6 @@ class EmotionalRegisterViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
 
-    // Crear
     fun registerEmotion(idEmocion: Int, fecha: LocalDate) {
         viewModelScope.launch {
             val result = repository.registerEmotion(idEmocion, fecha)
@@ -28,7 +27,6 @@ class EmotionalRegisterViewModel(
         }
     }
 
-    // Leer
     fun loadRegisters() {
         viewModelScope.launch {
             val result = repository.getAllRegisters()
@@ -37,7 +35,6 @@ class EmotionalRegisterViewModel(
         }
     }
 
-    // Actualizar
     fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate) {
         viewModelScope.launch {
             val result = repository.updateEmotion(id, newIdEmocion, newFecha)
@@ -46,7 +43,6 @@ class EmotionalRegisterViewModel(
         }
     }
 
-    //Eliminar
     fun deleteEmotion(id: Int) {
         viewModelScope.launch {
             val result = repository.deleteEmotion(id)
