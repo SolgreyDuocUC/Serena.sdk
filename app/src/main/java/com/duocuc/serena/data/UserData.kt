@@ -15,5 +15,7 @@ data class UserData(
     @ColumnInfo(name = "contrseniaUsuario")
     val userPassword: String,
     @ColumnInfo(name = "usuarioCondiciones")
-    val userAceptConditions: Boolean = true
+    val userAceptConditions: Boolean = true,
+    @ColumnInfo(name = "imagenUsuario")
+    val userImageUri: String? = null
 )

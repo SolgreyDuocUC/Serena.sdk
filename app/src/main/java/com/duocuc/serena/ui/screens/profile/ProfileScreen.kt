@@ -18,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.viewmodel.profile.ProfileViewModel
 import kotlinx.coroutines.launch
@@ -55,7 +57,7 @@ fun ProfileScreen(
     }
 
     fun createTempUri(): Uri {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val timeStamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
         val imageFileName = "JPEG_$timeStamp"
         val storageDir: File? = context.getExternalFilesDir(null)
         val imageFile = File.createTempFile(imageFileName, ".jpg", storageDir)
@@ -66,14 +68,16 @@ fun ProfileScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
-//            if (success) profileViewModel.updateImage(tempImageUri)
+            if (success) {
+                tempImageUri?.let { profileViewModel.onImageChange(it) }
+            }
         }
     )
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-//            profileViewModel.updateImage(uri)
+            uri?.let { profileViewModel.onImageChange(it) }
         }
     )
 
@@ -96,9 +100,7 @@ fun ProfileScreen(
                 TextButton(onClick = {
                     showDialog = false
                     val permission = Manifest.permission.CAMERA
-                    if (ContextCompat.checkSelfPermission(context, permission)
-                        == PackageManager.PERMISSION_GRANTED
-                    ) {
+                    if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
                         val uri = createTempUri()
                         cameraLauncher.launch(uri)
                     } else {
@@ -144,21 +146,21 @@ fun ProfileScreen(
                     .background(Color(0xFFE0E0E0))
                     .clickable { showDialog = true }
             ) {
-//                if (imageUri != null) {
-//                    AsyncImage(
-//                        model = imageUri,
-//                        contentDescription = "Foto de perfil",
-//                        modifier = Modifier.size(130.dp).clip(CircleShape),
-//                        contentScale = ContentScale.Crop
-//                    )
-//                } else {
-                Icon(
-                    imageVector = Icons.Default.AddAPhoto,
-                    contentDescription = "Agregar foto",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(48.dp)
-                )
-//                }
+                if (uiState.imageUri != null) {
+                    AsyncImage(
+                        model = uiState.imageUri,
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier.fillMaxSize().clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = "Agregar foto",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
             }
 
             Text("Toca la imagen para cambiarla", color = Color.Gray)

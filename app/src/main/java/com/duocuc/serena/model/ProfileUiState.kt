@@ -1,10 +1,13 @@
 package com.duocuc.serena.model
 
+import android.net.Uri
+
 data class ProfileUiState(
     val name: String = "",
     val email: String = "",
     val oldPassword: String = "",
     val newPassword: String = "",
+    val imageUri: Uri? = null,
     val isLoading: Boolean = false,
     val saveSuccess: Boolean = false,
     val errorMessage: String? = null,
