@@ -10,6 +10,13 @@ import androidx.navigation.compose.rememberNavController
 import com.duocuc.serena.navigation.AppNav
 import com.duocuc.serena.ui.theme.theme.SerenaTheme
 
+/*
+Rama de desarrollo para la app Serena.
+Desarrolladores:
+- Diego Arias
+- Solgrey Medina
+ */
+
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
