@@ -9,16 +9,24 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class Converters {
+
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun fromTimestamp(value: Long?): LocalDate? {
-        return value?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate() }
+        return value?.let {
+            Instant.ofEpochMilli(it)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun dateToTimestamp(date: LocalDate?): Long? {
-        return date?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+        return date
+            ?.atStartOfDay(ZoneId.systemDefault())
+            ?.toInstant()
+            ?.toEpochMilli()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -28,5 +36,11 @@ class Converters {
     @TypeConverter
     fun fromLocalDate(date: LocalDate?): String? {
         return date?.format(formatter)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @TypeConverter
+    fun toLocalDate(value: String?): LocalDate? {
+        return value?.let { LocalDate.parse(it, formatter) }
     }
 }

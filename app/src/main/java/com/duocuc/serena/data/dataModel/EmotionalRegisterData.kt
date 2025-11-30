@@ -8,5 +8,10 @@ import java.time.LocalDate
 data class EmotionalRegisterData(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val idEmocion: Int,
-    val fecha: LocalDate
+    val fecha: LocalDate,
+    val emocionNombre: String = "",
+    val emocionEmoji: String = "",
+    val descripcion: String = ""
 )
+
+

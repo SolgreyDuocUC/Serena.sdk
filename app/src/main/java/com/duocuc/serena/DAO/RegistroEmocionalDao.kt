@@ -6,7 +6,7 @@ import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 @Dao
 interface RegistroEmocionalDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEmotion(register: EmotionalRegisterData)
 
     @Update
@@ -19,7 +19,5 @@ interface RegistroEmocionalDao {
     suspend fun getAllRegisters(): List<EmotionalRegisterData>
 
     @Query("SELECT * FROM RegistroEmocionalUsuario WHERE id = :id")
-    suspend fun getRegistersById(id: Int): List<EmotionalRegisterData>
+    suspend fun getRegisterById(id: Int): EmotionalRegisterData?
 }
-
-

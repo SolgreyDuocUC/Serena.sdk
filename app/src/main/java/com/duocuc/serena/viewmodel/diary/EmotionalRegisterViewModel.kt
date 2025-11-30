@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.repository.EmotionalRegisterRepository
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-class EmotionLogViewModel(
+class EmotionalRegisterViewModel(
     private val repository: EmotionalRegisterRepository
 ) : ViewModel() {
 
@@ -19,8 +19,7 @@ class EmotionLogViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
 
-    // Crear
-    fun logEmotion(idEmocion: Int, fecha: LocalDate) {
+    fun registerEmotion(idEmocion: Int, fecha: LocalDate) {
         viewModelScope.launch {
             val result = repository.registerEmotion(idEmocion, fecha)
             result.onSuccess { loadRegisters() }
@@ -28,7 +27,6 @@ class EmotionLogViewModel(
         }
     }
 
-    // Leer
     fun loadRegisters() {
         viewModelScope.launch {
             val result = repository.getAllRegisters()
@@ -37,7 +35,6 @@ class EmotionLogViewModel(
         }
     }
 
-    // Actualizar
     fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate) {
         viewModelScope.launch {
             val result = repository.updateEmotion(id, newIdEmocion, newFecha)
@@ -46,7 +43,6 @@ class EmotionLogViewModel(
         }
     }
 
-    //Eliminar
     fun deleteEmotion(id: Int) {
         viewModelScope.launch {
             val result = repository.deleteEmotion(id)

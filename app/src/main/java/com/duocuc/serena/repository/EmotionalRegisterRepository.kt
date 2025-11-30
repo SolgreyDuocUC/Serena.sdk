@@ -9,10 +9,15 @@ import kotlin.Result
 
 class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
 
+    // INSERT
     suspend fun registerEmotion(idEmocion: Int, fecha: LocalDate): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
-                dao.insertEmotion(EmotionalRegisterData(idEmocion = idEmocion, fecha = fecha))
+                val newRegister = EmotionalRegisterData(
+                    idEmocion = idEmocion,
+                    fecha = fecha
+                )
+                dao.insertEmotion(newRegister)
                 Result.success(true)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -20,6 +25,7 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
         }
     }
 
+    // GET ALL
     suspend fun getAllRegisters(): Result<List<EmotionalRegisterData>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -30,12 +36,20 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
         }
     }
 
+    // UPDATE
     suspend fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
-                val register = dao.getRegistersById(id).firstOrNull()
+                val register = dao.getRegisterById(id)
                     ?: return@withContext Result.failure(Exception("Registro no encontrado"))
-                dao.updateEmotion(register.copy(idEmocion = newIdEmocion, fecha = newFecha))
+
+                dao.updateEmotion(
+                    register.copy(
+                        idEmocion = newIdEmocion,
+                        fecha = newFecha
+                    )
+                )
+
                 Result.success(true)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -43,12 +57,15 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
         }
     }
 
+    // DELETE
     suspend fun deleteEmotion(id: Int): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
-                val register = dao.getRegistersById(id).firstOrNull()
+                val register = dao.getRegisterById(id)
                     ?: return@withContext Result.failure(Exception("Registro no encontrado"))
+
                 dao.deleteEmotion(register)
+
                 Result.success(true)
             } catch (e: Exception) {
                 Result.failure(e)

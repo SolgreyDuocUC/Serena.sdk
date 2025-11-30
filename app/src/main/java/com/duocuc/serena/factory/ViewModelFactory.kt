@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.duocuc.serena.Graph
 import com.duocuc.serena.viewmodel.auth.LoginViewModel
 import com.duocuc.serena.viewmodel.auth.RegisterViewModel
-import com.duocuc.serena.viewmodel.emotionData.EmotionalRegisterViewModel
+import com.duocuc.serena.viewmodel.diary.EmotionalRegisterViewModel
 import com.duocuc.serena.viewmodel.profile.ProfileViewModel
 import com.duocuc.serena.viewmodel.profile.SessionViewModel
 
