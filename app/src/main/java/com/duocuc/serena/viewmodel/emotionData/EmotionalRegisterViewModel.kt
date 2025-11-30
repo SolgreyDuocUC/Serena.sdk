@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+// Se asume que este constructor es manejado por una Factory o un sistema de inyección (como Hilt/Koin)
 class EmotionalRegisterViewModel(
     private val repository: EmotionalRegisterRepository
 ) : ViewModel() {
@@ -19,14 +20,21 @@ class EmotionalRegisterViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
 
-    fun registerEmotion(idEmocion: Int, fecha: LocalDate) {
+    /**
+     * Registra una nueva emoción con la descripción del día.
+     */
+    fun registerEmotion(idEmocion: Int, descripcion: String, fecha: LocalDate) {
         viewModelScope.launch {
-            val result = repository.registerEmotion(idEmocion, fecha)
+            // Se asume que el repositorio ahora acepta la descripción
+            val result = repository.registerEmotion(idEmocion, descripcion, fecha)
             result.onSuccess { loadRegisters() }
                 .onFailure { _error.value = it.message }
         }
     }
 
+    /**
+     * Carga todos los registros emocionales.
+     */
     fun loadRegisters() {
         viewModelScope.launch {
             val result = repository.getAllRegisters()
@@ -35,14 +43,21 @@ class EmotionalRegisterViewModel(
         }
     }
 
-    fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate) {
+    /**
+     * Actualiza una emoción existente, incluyendo la nueva descripción.
+     */
+    fun updateEmotion(id: Int, newIdEmocion: Int, newDescripcion: String, newFecha: LocalDate) {
         viewModelScope.launch {
-            val result = repository.updateEmotion(id, newIdEmocion, newFecha)
+            // Se asume que el repositorio ahora acepta la descripción
+            val result = repository.updateEmotion(id, newIdEmocion, newDescripcion, newFecha)
             result.onSuccess { loadRegisters() }
                 .onFailure { _error.value = it.message }
         }
     }
 
+    /**
+     * Elimina un registro por ID.
+     */
     fun deleteEmotion(id: Int) {
         viewModelScope.launch {
             val result = repository.deleteEmotion(id)

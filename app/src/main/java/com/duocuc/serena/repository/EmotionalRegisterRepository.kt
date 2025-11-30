@@ -10,11 +10,12 @@ import kotlin.Result
 class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
 
     // INSERT
-    suspend fun registerEmotion(idEmocion: Int, fecha: LocalDate): Result<Boolean> {
+    suspend fun registerEmotion(idEmocion: Int, descripcion: String, fecha: LocalDate): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
                 val newRegister = EmotionalRegisterData(
                     idEmocion = idEmocion,
+                    descripcion = descripcion,
                     fecha = fecha
                 )
                 dao.insertEmotion(newRegister)
@@ -37,7 +38,7 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
     }
 
     // UPDATE
-    suspend fun updateEmotion(id: Int, newIdEmocion: Int, newFecha: LocalDate): Result<Boolean> {
+    suspend fun updateEmotion(id: Int, newIdEmocion: Int, newDescripcion: String, newFecha: LocalDate): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
                 val register = dao.getRegisterById(id)
@@ -46,6 +47,7 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
                 dao.updateEmotion(
                     register.copy(
                         idEmocion = newIdEmocion,
+                        descripcion = newDescripcion,
                         fecha = newFecha
                     )
                 )
