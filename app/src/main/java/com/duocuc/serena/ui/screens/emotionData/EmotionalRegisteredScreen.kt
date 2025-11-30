@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.factory.ViewModelFactory
-import com.duocuc.serena.viewmodel.diary.EmotionalRegisterViewModel
+import com.duocuc.serena.viewmodel.emotionData.EmotionalRegisterViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.lazy.items

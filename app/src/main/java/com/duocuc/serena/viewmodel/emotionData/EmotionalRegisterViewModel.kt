@@ -1,4 +1,4 @@
-package com.duocuc.serena.viewmodel.diary
+package com.duocuc.serena.viewmodel.emotionData
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
