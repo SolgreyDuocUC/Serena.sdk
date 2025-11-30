@@ -23,18 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.factory.ViewModelFactory
-import com.duocuc.serena.ui.theme.theme.LightAccent
-import com.duocuc.serena.ui.theme.theme.LightDestructive
-import com.duocuc.serena.ui.theme.theme.LightMutedForeground
-import com.duocuc.serena.ui.theme.theme.LightPrimary
-import com.duocuc.serena.ui.theme.theme.LightSecondary
-import com.duocuc.serena.ui.theme.theme.LightSuccess
+import com.duocuc.serena.ui.theme.theme.*
 import com.duocuc.serena.viewmodel.emotionData.EmotionalRegisterViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -112,7 +107,7 @@ fun EmotionalRegisteredScreen(
                                 showDialog = true
                             },
                             shape = MaterialTheme.shapes.medium,
-                            modifier = Modifier.height(48.dp)
+                            modifier = Modifier.defaultMinSize(minHeight = 48.dp)
                         ) { Text("Agregar primera emoción") }
                     }
                 }
@@ -177,17 +172,19 @@ fun EmotionalDataDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            shape = RoundedCornerShape(28.dp),
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp)
+                modifier = Modifier.padding(20.dp)
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.align(Alignment.CenterStart)
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     IconButton(
                         onClick = onDismiss,
@@ -201,11 +198,10 @@ fun EmotionalDataDialog(
                     text = "¿Cómo te sentiste este día?",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
                 )
 
-                // Grid de Emociones
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         emotions.take(3).forEach { emotion ->
                             EmotionButton(
@@ -235,25 +231,32 @@ fun EmotionalDataDialog(
                     onValueChange = { description = it },
                     label = { Text("Describe tu día (opcional)") },
                     placeholder = { Text("¿Qué pasó? ¿Qué te hizo sentir así?") },
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 90.dp, max = 150.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    maxLines = 5
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
                         onClick = { onSave(selectedEmotionId, description.trim()) },
                         enabled = selectedEmotionId != null,
-                        modifier = Modifier.weight(1f).height(48.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Guardar entrada") }
+                    ) { Text("Guardar") }
                     OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f).height(48.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) { Text("Cancelar") }
                 }
@@ -273,19 +276,33 @@ fun EmotionButton(
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
     OutlinedCard(
-        modifier = modifier.aspectRatio(1.2f).clickable(onClick = onClick),
+        modifier = modifier
+            .aspectRatio(1f)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        border = BorderStroke(if (isSelected) 1.5.dp else 1.dp, borderColor)
+        border = BorderStroke(if (isSelected) 2.dp else 1.dp, borderColor)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = emotion.emoji, fontSize = 28.sp)
+            Text(
+                text = emotion.emoji,
+                style = MaterialTheme.typography.headlineLarge,
+                maxLines = 1
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = emotion.label, color = if (isSelected) MaterialTheme.colorScheme.primary else emotion.color, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text(
+                text = emotion.label,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
@@ -317,21 +334,21 @@ fun EmotionCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = emotionLabel,
-                    style = MaterialTheme.typography.titleLarge.copy(
+                    style = MaterialTheme.typography.titleMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Medium
                     )
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = register.fecha.format(formatter),
-                    style = MaterialTheme.typography.bodyLarge.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
