@@ -27,18 +27,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 import com.duocuc.serena.factory.ViewModelFactory
+import com.duocuc.serena.ui.screens.BottomNavBar
 import com.duocuc.serena.ui.theme.theme.*
 import com.duocuc.serena.viewmodel.emotionData.EmotionalRegisterViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+// ------------------------- SCREEN ------------------------
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmotionalRegisteredScreen(
+    navController: NavController, // Se añade NavController
     viewModel: EmotionalRegisterViewModel = viewModel(factory = ViewModelFactory())
 ) {
     val registers by viewModel.registers.collectAsState()
@@ -47,18 +52,26 @@ fun EmotionalRegisteredScreen(
     var showDialog by remember { mutableStateOf(false) }
     var selectedRegister by remember { mutableStateOf<EmotionalRegisterData?>(null) }
 
+    // Filtramos los registros para mostrar solo los de hoy
+    val today = LocalDate.now()
+    val dailyRegisters = registers.filter { it.fecha.isEqual(today) }
+
     LaunchedEffect(Unit) { viewModel.loadRegisters() }
 
     Scaffold(
+        bottomBar = { BottomNavBar(navController = navController) }, // Añadir BottomNavBar
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    selectedRegister = null
-                    showDialog = true
-                },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Agregar emoción", tint = MaterialTheme.colorScheme.onPrimary)
+            // Permitir agregar solo si no hay registro para hoy (o se está editando uno existente)
+            if (dailyRegisters.isEmpty() || selectedRegister != null) {
+                FloatingActionButton(
+                    onClick = {
+                        selectedRegister = dailyRegisters.firstOrNull() // Si ya existe, se edita
+                        showDialog = true
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Agregar emoción", tint = MaterialTheme.colorScheme.onPrimary)
+                }
             }
         }
     ) { paddingValues ->
@@ -70,11 +83,19 @@ fun EmotionalRegisteredScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "Registro Emocional",
+                text = "Tu Diario de Hoy",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = today.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -90,14 +111,15 @@ fun EmotionalRegisteredScreen(
                 )
             }
 
-            if (registers.isEmpty()) {
+            // Mostrar sólo el registro del día
+            if (dailyRegisters.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Text(
-                            text = "Aún no has registrado emociones.",
+                            text = "Aún no has registrado emociones para hoy.",
                             style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                             textAlign = TextAlign.Center
                         )
@@ -108,7 +130,7 @@ fun EmotionalRegisteredScreen(
                             },
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.defaultMinSize(minHeight = 48.dp)
-                        ) { Text("Agregar primera emoción") }
+                        ) { Text("Agregar emoción de hoy") }
                     }
                 }
             } else {
@@ -116,7 +138,7 @@ fun EmotionalRegisteredScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize().padding(top = 8.dp)
                 ) {
-                    items(registers) { register ->
+                    items(dailyRegisters) { register ->
                         EmotionCard(
                             register = register,
                             formatter = formatter,
@@ -138,10 +160,12 @@ fun EmotionalRegisteredScreen(
                 onDismiss = { showDialog = false },
                 onSave = { emotionId, descriptionText ->
                     if (emotionId != null) {
-                        if (selectedRegister == null) {
-                            viewModel.registerEmotion(emotionId, descriptionText, LocalDate.now())
+                        if (selectedRegister == null || !selectedRegister!!.fecha.isEqual(today)) {
+                            // Nuevo registro o registro en otro día (aunque la UI solo debería mostrar hoy)
+                            viewModel.registerEmotion(emotionId, descriptionText, today)
                         } else {
-                            viewModel.updateEmotion(selectedRegister!!.id, emotionId, descriptionText, LocalDate.now())
+                            // Actualizar el registro existente de hoy
+                            viewModel.updateEmotion(selectedRegister!!.id, emotionId, descriptionText, today)
                         }
                     }
                     showDialog = false
@@ -150,6 +174,8 @@ fun EmotionalRegisteredScreen(
         }
     }
 }
+
+// ------------------------- DIALOG Y COMPONENTES ------------------------
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -169,6 +195,7 @@ fun EmotionalDataDialog(
 
     var selectedEmotionId by remember { mutableStateOf(register?.idEmocion) }
     var description by remember { mutableStateOf(register?.descripcion ?: "") }
+    val today = LocalDate.now()
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -180,7 +207,7 @@ fun EmotionalDataDialog(
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                        text = today.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.CenterStart),
                         maxLines = 1,
@@ -345,6 +372,7 @@ fun EmotionCard(
                         fontWeight = FontWeight.Medium
                     )
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = register.fecha.format(formatter),

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.navigation.Route
 import com.duocuc.serena.viewmodel.profile.SessionViewModel
@@ -44,28 +45,33 @@ data class BottomNavItem(
 
 private val bottomNavItems = listOf(
     BottomNavItem(Route.EmotionalRegistered, Icons.Filled.FavoriteBorder, "Diario"),
-    BottomNavItem(Route.Calendar, Icons.Filled.CalendarToday, "Calendario"),
+    BottomNavItem(Route.Home, Icons.Filled.CalendarToday, "Calendario"),
     BottomNavItem(Route.Profile, Icons.Filled.AccountCircle, "Usuario"),
     BottomNavItem(Route.LearningPath, Icons.Filled.School, "Aprendizaje")
 )
 
 @Composable
 fun BottomNavBar(navController: NavController) {
-    var selectedItem by remember { mutableStateOf(navController.currentBackStackEntry?.destination?.route ?: Route.EmotionalRegistered.path) }
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    var selectedItem by remember { mutableStateOf(currentRoute ?: Route.Home.path) }
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         bottomNavItems.forEach { item ->
+            val isSelected = selectedItem == item.route.path || currentRoute == item.route.path
+
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
-                selected = selectedItem == item.route.path,
+                selected = isSelected,
                 onClick = {
-                    selectedItem = item.route.path
-                    navController.navigate(item.route.path) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
+                    if (currentRoute != item.route.path) {
+                        selectedItem = item.route.path
+                        navController.navigate(item.route.path) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
@@ -273,8 +279,11 @@ fun CalendarContent(navController: NavController) {
                 fontWeight = FontWeight.ExtraBold
             )
 
+            // Deshabilitar botón de mes siguiente si se está en el mes actual o posterior
+            val isCurrentMonthOrFuture = currentMonth >= YearMonth.now()
             IconButton(
                 onClick = { currentMonth = currentMonth.plusMonths(1) },
+                enabled = !isCurrentMonthOrFuture,
                 modifier = Modifier.size(40.dp)
             ) { Icon(Icons.Filled.ChevronRight, contentDescription = "Mes siguiente") }
         }
@@ -313,7 +322,6 @@ fun CalendarGrid(
     val firstDayOfMonth = currentMonth.atDay(1)
     val startDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
     val daysInMonth = currentMonth.lengthOfMonth()
-    startDayOfWeek + daysInMonth
 
     val daysList = (0 until 42).map { index ->
         val dayNumber = index - startDayOfWeek + 1
@@ -324,8 +332,7 @@ fun CalendarGrid(
 
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val totalWidth = this.maxWidth
-        val cellPadding = 8.dp
-        val dayCellSize = (totalWidth / 7) - (cellPadding * 2 / 7)
+        val dayCellSize = (totalWidth / 7)
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             rows.forEach { row ->
@@ -334,7 +341,7 @@ fun CalendarGrid(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     row.forEach { date ->
-                        DayCellAlternative(date, date == today, dayCellSize, onDayClick)
+                        DayCellAlternative(date, today, dayCellSize, onDayClick)
                     }
                 }
             }
@@ -342,26 +349,29 @@ fun CalendarGrid(
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DayCellAlternative(
     date: LocalDate?,
-    isToday: Boolean,
+    today: LocalDate,
     size: Dp,
     onClick: (LocalDate) -> Unit
 ) {
     val day = date?.dayOfMonth
+    val isSelectable = date != null && (date.isBefore(today) || date.isEqual(today))
+    val isToday = date?.isEqual(today)
 
     val backgroundColor = when {
         date == null -> Color.Transparent
-        isToday -> MaterialTheme.colorScheme.primary
+        isToday == true -> MaterialTheme.colorScheme.primary
+        !isSelectable -> Color.LightGray.copy(alpha = 0.3f)
         else -> MaterialTheme.colorScheme.surface
     }
 
     val contentColor = when {
         date == null -> Color.Transparent
-        isToday -> MaterialTheme.colorScheme.onPrimary
+        isToday == true -> MaterialTheme.colorScheme.onPrimary
+        !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f) // Color para texto de días futuros
         else -> MaterialTheme.colorScheme.onSurface
     }
 
@@ -370,7 +380,7 @@ fun DayCellAlternative(
             .size(size)
             .clip(CircleShape)
             .background(backgroundColor)
-            .clickable(enabled = date != null) {
+            .clickable(enabled = isSelectable) {
                 date?.let { onClick(it) }
             },
         contentAlignment = Alignment.Center

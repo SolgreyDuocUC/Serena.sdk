@@ -64,12 +64,11 @@ fun AppNav() {
             HomeAppScreen(nav = navController)
         }
 
-        composable(Route.Calendar.path) { /* Placeholder */ }
         composable(Route.MessageOfDay.path) { /* Placeholder */ }
         composable(Route.LearningPath.path) { LearningPathScreen(navController = navController) }
 
         composable(Route.EmotionalRegistered.path) {
-            EmotionalRegisteredScreen()
+            EmotionalRegisteredScreen(navController = navController)
         }
 
         composable(Route.Profile.path) {
