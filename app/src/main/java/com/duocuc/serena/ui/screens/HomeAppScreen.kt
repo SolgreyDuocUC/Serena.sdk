@@ -113,7 +113,7 @@ fun HomeAppScreen(
     val coroutineScope = rememberCoroutineScope()
     val activeUser by sessionViewModel.activeUser.collectAsState()
     val userName = activeUser?.userName ?: "Usuario"
-    val encouragingMessage = "¡Ancla tu mente al presente, $userName! Aquí y ahora estás bien ✨"
+    val encouragingMessage = "¡Ancla tu mente al presente, $userName! Aquí y ahora estás bien"
 
     ModalNavigationDrawer(
         drawerState = drawerState,

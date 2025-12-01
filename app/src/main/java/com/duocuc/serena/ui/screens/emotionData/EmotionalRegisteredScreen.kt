@@ -43,7 +43,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmotionalRegisteredScreen(
-    navController: NavController, // Se añade NavController
+    navController: NavController,
     date: LocalDate,
     viewModel: EmotionalRegisterViewModel = viewModel(factory = ViewModelFactory())
 ) {
@@ -51,27 +51,24 @@ fun EmotionalRegisteredScreen(
     val error by viewModel.error.collectAsState()
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("es", "ES"))
     var showDialog by remember { mutableStateOf(false) }
+
     var selectedRegister by remember { mutableStateOf<EmotionalRegisterData?>(null) }
 
-    // Filtramos los registros para mostrar solo los de la fecha seleccionada
     val dailyRegisters = registers.filter { it.fecha.isEqual(date) }
 
     LaunchedEffect(Unit) { viewModel.loadRegisters() }
 
     Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }, // Añadir BottomNavBar
+        bottomBar = { BottomNavBar(navController = navController) },
         floatingActionButton = {
-            // Permitir agregar solo si no hay registro para el día seleccionado
-            if (dailyRegisters.isEmpty() || selectedRegister != null) {
-                FloatingActionButton(
-                    onClick = {
-                        selectedRegister = dailyRegisters.firstOrNull() // Si ya existe, se edita
-                        showDialog = true
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Agregar emoción", tint = MaterialTheme.colorScheme.onPrimary)
-                }
+            FloatingActionButton(
+                onClick = {
+                    selectedRegister = null
+                    showDialog = true
+                },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Agregar nueva emoción", tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
     ) { paddingValues ->
@@ -111,7 +108,6 @@ fun EmotionalRegisteredScreen(
                 )
             }
 
-            // Mostrar sólo el registro del día seleccionado
             if (dailyRegisters.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -142,6 +138,10 @@ fun EmotionalRegisteredScreen(
                         EmotionCard(
                             register = register,
                             formatter = formatter,
+                            onView = {
+                                selectedRegister = register
+                                showDialog = true
+                            },
                             onEdit = {
                                 selectedRegister = register
                                 showDialog = true
@@ -158,14 +158,13 @@ fun EmotionalRegisteredScreen(
             EmotionalDataDialog(
                 register = selectedRegister,
                 date = date,
+                isReadOnly = selectedRegister != null,
                 onDismiss = { showDialog = false },
                 onSave = { emotionId, descriptionText ->
                     if (emotionId != null) {
                         if (selectedRegister == null) {
-                            // Nuevo registro con la fecha seleccionada
                             viewModel.registerEmotion(emotionId, descriptionText, date)
                         } else {
-                            // Actualizar el registro existente
                             viewModel.updateEmotion(selectedRegister!!.id, emotionId, descriptionText, date)
                         }
                     }
@@ -183,6 +182,7 @@ fun EmotionalRegisteredScreen(
 fun EmotionalDataDialog(
     register: EmotionalRegisterData?,
     date: LocalDate,
+    isReadOnly: Boolean,
     onDismiss: () -> Unit,
     onSave: (Int?, String) -> Unit
 ) {
@@ -198,6 +198,10 @@ fun EmotionalDataDialog(
     var selectedEmotionId by remember { mutableStateOf(register?.idEmocion) }
     var description by remember { mutableStateOf(register?.descripcion ?: "") }
 
+    val canEdit = !isReadOnly
+
+    val emotionDisplayed = emotions.find { it.id == selectedEmotionId }
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(20.dp),
@@ -208,8 +212,12 @@ fun EmotionalDataDialog(
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = date.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
-                        style = MaterialTheme.typography.titleMedium,
+                        text = when {
+                            canEdit && register == null -> "Agregar Registro"
+                            canEdit -> "Editar Registro"
+                            else -> "Detalles del Registro"
+                        },
+                        style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.align(Alignment.CenterStart),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -223,30 +231,61 @@ fun EmotionalDataDialog(
                 }
 
                 Text(
+                    text = date.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                )
+
+                Text(
                     text = "¿Cómo te sentiste este día?",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
                 )
 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        emotions.take(3).forEach { emotion ->
-                            EmotionButton(
-                                emotion = emotion,
-                                isSelected = selectedEmotionId == emotion.id,
-                                onClick = { selectedEmotionId = emotion.id },
-                                modifier = Modifier.weight(1f)
-                            )
+                if (canEdit) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            emotions.take(3).forEach { emotion ->
+                                EmotionButton(
+                                    emotion = emotion,
+                                    isSelected = selectedEmotionId == emotion.id,
+                                    onClick = { selectedEmotionId = emotion.id },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            emotions.drop(3).forEach { emotion ->
+                                EmotionButton(
+                                    emotion = emotion,
+                                    isSelected = selectedEmotionId == emotion.id,
+                                    onClick = { selectedEmotionId = emotion.id },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        emotions.drop(3).forEach { emotion ->
-                            EmotionButton(
-                                emotion = emotion,
-                                isSelected = selectedEmotionId == emotion.id,
-                                onClick = { selectedEmotionId = emotion.id },
-                                modifier = Modifier.weight(1f)
+                } else if (emotionDisplayed != null) {
+                    OutlinedCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = emotionDisplayed.emoji,
+                                style = MaterialTheme.typography.headlineLarge,
+                                modifier = Modifier.padding(end = 12.dp)
+                            )
+                            Text(
+                                text = emotionDisplayed.label,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -254,39 +293,68 @@ fun EmotionalDataDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Describe tu día (opcional)") },
-                    placeholder = { Text("¿Qué pasó? ¿Qué te hizo sentir así?") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 90.dp, max = 150.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    maxLines = 5
-                )
+                if (canEdit) {
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text("Describe tu día (opcional)") },
+                        placeholder = { Text("¿Qué pasó? ¿Qué te hizo sentir así?") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 90.dp, max = 150.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        maxLines = 5
+                    )
+                } else if (description.isNotBlank()) {
+                    Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)).padding(16.dp)) {
+                        Text(
+                            text = "Tu Descripción:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "No se proporcionó una descripción para este registro.",
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                if (canEdit) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            onClick = { onSave(selectedEmotionId, description.trim()) },
+                            enabled = selectedEmotionId != null,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) { Text("Guardar") }
+                        OutlinedButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) { Text("Cancelar") }
+                    }
+                } else {
                     Button(
-                        onClick = { onSave(selectedEmotionId, description.trim()) },
-                        enabled = selectedEmotionId != null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) { Text("Guardar") }
-                    OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Cancelar") }
+                    ) { Text("Cerrar") }
                 }
             }
         }
@@ -342,21 +410,27 @@ data class EmotionInfo(val id: Int, val label: String, val emoji: String, val co
 fun EmotionCard(
     register: EmotionalRegisterData,
     formatter: DateTimeFormatter,
+    onView: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val emotionLabel = when (register.idEmocion) {
-        1 -> "Feliz 😊"
-        2 -> "Triste 😢"
-        3 -> "Neutral 😐"
-        4 -> "Enamorado ❤️"
-        5 -> "Ansioso 😰"
-        6 -> "Enojado 😠"
-        else -> "Desconocido 🤔"
+    val emotionInfo = when (register.idEmocion) {
+        1 -> Triple("Feliz 😊", "¡Qué bien! Un día lleno de alegría y satisfacción.", 1)
+        2 -> Triple("Triste 😢", "Tómate un momento. Está bien sentirse así a veces.", 1)
+        3 -> Triple("Neutral 😐", "Un día tranquilo. A veces, la calma es lo que se necesita.", 1)
+        4 -> Triple("Enamorado ❤️", "¡El amor está en el aire! Siente esas mariposas.", 1)
+        5 -> Triple("Ansioso 😰", "Respira profundo. Recuerda que la ansiedad es temporal.", 1)
+        6 -> Triple("Enojado 😠", "Identifica qué te molesta. No dejes que la rabia te controle.", 1)
+        else -> Triple("Desconocido 🤔", "Explora tus sentimientos. ¿Qué emoción te define ahora?", 1)
     }
 
+    val emotionLabel = emotionInfo.first
+    val accompanyingPhrase = emotionInfo.second
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onView),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -373,11 +447,28 @@ fun EmotionCard(
                         fontWeight = FontWeight.Medium
                     )
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = accompanyingPhrase,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.primary
+                    ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = register.descripcion,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = register.fecha.format(formatter),
-                    style = MaterialTheme.typography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
