@@ -50,6 +50,7 @@ private val bottomNavItems = listOf(
     BottomNavItem(Route.LearningPath, Icons.Filled.School, "Aprendizaje")
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomNavBar(navController: NavController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -59,16 +60,22 @@ fun BottomNavBar(navController: NavController) {
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         bottomNavItems.forEach { item ->
-            val isSelected = selectedItem == item.route.path || currentRoute == item.route.path
+            val isSelected = currentRoute?.startsWith(item.route.path.split("/").first()) == true
 
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
                 selected = isSelected,
                 onClick = {
-                    if (currentRoute != item.route.path) {
+                    val routePath = if (item.route == Route.EmotionalRegistered) {
+                        Route.EmotionalRegistered.createRoute(LocalDate.now())
+                    } else {
+                        item.route.path
+                    }
+
+                    if (currentRoute != routePath) {
                         selectedItem = item.route.path
-                        navController.navigate(item.route.path) {
+                        navController.navigate(routePath) {
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
                         }
@@ -274,7 +281,7 @@ fun CalendarContent(navController: NavController) {
             ) { Icon(Icons.Filled.ChevronLeft, contentDescription = "Mes anterior") }
 
             Text(
-                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es")).capitalize(Locale("es"))} ${currentMonth.year}",
+                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }} ${currentMonth.year}",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold
             )
