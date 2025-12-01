@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -169,7 +170,7 @@ fun ProfileScreen(
                 value = uiState.name,
                 onValueChange = profileViewModel::onNameChange,
                 label = { Text("Nombre") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("ProfileNameField"),
                 isError = uiState.errorMessage?.contains("nombre", ignoreCase = true) == true
             )
 
@@ -177,7 +178,7 @@ fun ProfileScreen(
                 value = uiState.email,
                 onValueChange = profileViewModel::onEmailChange,
                 label = { Text("Correo Electrónico") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("ProfileEmailField"),
                 isError = uiState.errorMessage?.contains("email", ignoreCase = true) == true
             )
 
@@ -186,7 +187,7 @@ fun ProfileScreen(
                 onValueChange = profileViewModel::onOldPasswordChange,
                 label = { Text("Contraseña actual") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("ProfileOldPasswordField"),
                 isError = uiState.errorMessage?.contains("contraseña", ignoreCase = true) == true
             )
 
@@ -195,7 +196,7 @@ fun ProfileScreen(
                 onValueChange = profileViewModel::onNewPasswordChange,
                 label = { Text("Nueva contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().testTag("ProfileNewPasswordField")
             )
 
             if (uiState.errorMessage != null) {
@@ -210,7 +211,7 @@ fun ProfileScreen(
 
             Button(
                 onClick = profileViewModel::saveChanges,
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp).testTag("ProfileSaveButton"),
                 enabled = !uiState.isLoading
             ) {
                 if (uiState.isLoading) {

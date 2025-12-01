@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,7 +69,8 @@ fun EmotionalRegisteredScreen(
                         selectedRegister = dailyRegisters.firstOrNull() // Si ya existe, se edita
                         showDialog = true
                     },
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.testTag("AddEmotionButton")
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Agregar emoción", tint = MaterialTheme.colorScheme.onPrimary)
                 }
@@ -129,7 +131,7 @@ fun EmotionalRegisteredScreen(
                                 showDialog = true
                             },
                             shape = MaterialTheme.shapes.medium,
-                            modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                            modifier = Modifier.defaultMinSize(minHeight = 48.dp).testTag("AddEmotionButton_Empty")
                         ) { Text("Agregar emoción") }
                     }
                 }
@@ -146,7 +148,8 @@ fun EmotionalRegisteredScreen(
                                 selectedRegister = register
                                 showDialog = true
                             },
-                            onDelete = { viewModel.deleteEmotion(register.id) }
+                            onDelete = { viewModel.deleteEmotion(register.id) },
+                            modifier = Modifier.testTag("EmotionCard_${register.id}")
                         )
                     }
                     item { Spacer(modifier = Modifier.height(80.dp)) }
@@ -216,7 +219,7 @@ fun EmotionalDataDialog(
                     )
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.align(Alignment.CenterEnd)
+                        modifier = Modifier.align(Alignment.CenterEnd).testTag("CloseDialogButton")
                     ) {
                         Icon(Icons.Default.Close, contentDescription = "Cerrar")
                     }
@@ -236,7 +239,7 @@ fun EmotionalDataDialog(
                                 emotion = emotion,
                                 isSelected = selectedEmotionId == emotion.id,
                                 onClick = { selectedEmotionId = emotion.id },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f).testTag("EmotionButton_${emotion.id}")
                             )
                         }
                     }
@@ -246,7 +249,7 @@ fun EmotionalDataDialog(
                                 emotion = emotion,
                                 isSelected = selectedEmotionId == emotion.id,
                                 onClick = { selectedEmotionId = emotion.id },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f).testTag("EmotionButton_${emotion.id}")
                             )
                         }
                     }
@@ -261,7 +264,8 @@ fun EmotionalDataDialog(
                     placeholder = { Text("¿Qué pasó? ¿Qué te hizo sentir así?") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 90.dp, max = 150.dp),
+                        .heightIn(min = 90.dp, max = 150.dp)
+                        .testTag("DescriptionField"),
                     shape = RoundedCornerShape(12.dp),
                     maxLines = 5
                 )
@@ -277,7 +281,8 @@ fun EmotionalDataDialog(
                         enabled = selectedEmotionId != null,
                         modifier = Modifier
                             .weight(1f)
-                            .height(48.dp),
+                            .height(48.dp)
+                            .testTag("SaveEmotionButton"),
                         shape = RoundedCornerShape(12.dp)
                     ) { Text("Guardar") }
                     OutlinedButton(
@@ -343,7 +348,8 @@ fun EmotionCard(
     register: EmotionalRegisterData,
     formatter: DateTimeFormatter,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val emotionLabel = when (register.idEmocion) {
         1 -> "Feliz 😊"
@@ -356,7 +362,7 @@ fun EmotionCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)

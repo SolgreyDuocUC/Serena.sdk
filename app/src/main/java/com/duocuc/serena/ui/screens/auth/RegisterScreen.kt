@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -93,7 +94,7 @@ private fun RegisterForm(
             onValueChange = viewModel::onUserNameChange,
             label = { Text("Nombre de usuario") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("RegisterUsernameField"),
             isError = uiState.userNameError != null,
             supportingText = {
                 if (uiState.userNameError != null) {
@@ -113,7 +114,7 @@ private fun RegisterForm(
             label = { Text("Correo electrónico") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("RegisterEmailField"),
             isError = uiState.userEmailError != null,
             supportingText = {
                 if (uiState.userEmailError != null) {
@@ -134,7 +135,7 @@ private fun RegisterForm(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("RegisterPasswordField"),
             isError = uiState.userPasswordError != null,
             supportingText = {
                 if (uiState.userPasswordError != null) {
@@ -155,7 +156,7 @@ private fun RegisterForm(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("RegisterConfirmPasswordField"),
             isError = uiState.userRepeatPasswordError != null,
             supportingText = {
                 if (uiState.userRepeatPasswordError != null) {
@@ -175,7 +176,8 @@ private fun RegisterForm(
         ) {
             Checkbox(
                 checked = uiState.userAcceptConditions,
-                onCheckedChange = viewModel::onUserAcceptConditionsChange
+                onCheckedChange = viewModel::onUserAcceptConditionsChange,
+                modifier = Modifier.testTag("RegisterTermsCheckbox")
             )
             Text(
                 text = "Acepto los términos y condiciones",
@@ -188,7 +190,7 @@ private fun RegisterForm(
 
         Button(
             onClick = viewModel::register,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(50.dp).testTag("RegisterButton"),
             enabled = uiState.isFormValid && !uiState.isLoading
         ) {
             Text("Registrarse")

@@ -112,28 +112,21 @@ class RegisterViewModel(
         _uiState.update { it.copy(isLoading = true, registrationError = null) }
 
         viewModelScope.launch {
-            try {
-                val result = userRepository.registerUser(
-                    email = state.userEmail,
-                    password = state.userPassword,
-                    name = state.userName,
-                )
+            val result = userRepository.registerUser(
+                email = state.userEmail,
+                password = state.userPassword,
+                name = state.userName,
+            )
 
-                if (result.isSuccess) {
-                    _uiState.update { it.copy(
-                        isRegistrationSuccessful = true,
-                        isLoading = false
-                    )}
-                } else {
-                    _uiState.update { it.copy(
-                        registrationError = result.exceptionOrNull()?.message ?: "Error desconocido en el registro.",
-                        isLoading = false
-                    )}
-                }
-
-            } catch (e: Exception) {
+            // Correctly handle Result<Boolean>
+            if (result.isSuccess && result.getOrNull() == true) {
                 _uiState.update { it.copy(
-                    registrationError = e.message ?: "Error de red o conexión.",
+                    isRegistrationSuccessful = true,
+                    isLoading = false
+                )}
+            } else {
+                _uiState.update { it.copy(
+                    registrationError = result.exceptionOrNull()?.message ?: "Error desconocido en el registro.",
                     isLoading = false
                 )}
             }
