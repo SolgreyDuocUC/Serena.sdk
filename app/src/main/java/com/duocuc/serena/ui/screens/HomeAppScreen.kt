@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.duocuc.serena.ui.screens
 
 import android.os.Build
@@ -97,6 +99,8 @@ fun HomeAppScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     val activeUser by sessionViewModel.activeUser.collectAsState()
+    val userName = activeUser?.userName ?: "Usuario"
+    val encouragingMessage = "¡Ancla tu mente al presente, $userName! Aquí y ahora estás bien ✨"
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -151,33 +155,25 @@ fun HomeAppScreen(
     ) {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
+                TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
                             Icon(Icons.Filled.Menu, contentDescription = "Menú")
                         }
                     },
                     title = {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(horizontalAlignment = Alignment.Start) {
                             Text(
-                                text = "Bienvenido, ${activeUser?.userName ?: "Usuario"}",
+                                text = "Hola, $userName 👋",
                                 style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                ),
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = "Crecimiento emocional diario",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                textAlign = TextAlign.Center
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        containerColor = MaterialTheme.colorScheme.background,
                         titleContentColor = MaterialTheme.colorScheme.onSurface
                     )
                 )
@@ -192,11 +188,30 @@ fun HomeAppScreen(
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(Modifier.height(8.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = encouragingMessage,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
                 Spacer(Modifier.height(16.dp))
 
                 Text(
                     text = "Calendario Emocional",
-                    style = MaterialTheme.typography.headlineMedium.copy(
+                    style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     ),
@@ -207,7 +222,7 @@ fun HomeAppScreen(
 
                 Text(
                     text = "Visualiza y registra tus emociones cada día",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.Gray),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
@@ -215,8 +230,9 @@ fun HomeAppScreen(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     CalendarContent(nav)
                 }
@@ -227,50 +243,39 @@ fun HomeAppScreen(
 
 // ------------------------- CALENDARIO ------------------------
 
-@Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarContent(navController: NavController) {
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val today = LocalDate.now()
-    val daysOfWeek = listOf("Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb")
-    val firstDayOfMonth = currentMonth.atDay(1)
-    val daysInMonth = currentMonth.lengthOfMonth()
-    val startDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
-    val totalCells = ((startDayOfWeek + daysInMonth + 6) / 7) * 7
-    val days = (0 until totalCells).map { index ->
-        val dayNumber = index - startDayOfWeek + 1
-        if (dayNumber in 1..daysInMonth) dayNumber else null
-    }
+    val daysOfWeek = listOf("D", "L", "M", "X", "J", "V", "S")
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedIconButton(
+            IconButton(
                 onClick = { currentMonth = currentMonth.minusMonths(1) },
-                modifier = Modifier.size(36.dp),
-                shape = RoundedCornerShape(8.dp)
+                modifier = Modifier.size(40.dp)
             ) { Icon(Icons.Filled.ChevronLeft, contentDescription = "Mes anterior") }
 
             Text(
-                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es"))} de ${currentMonth.year}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es")).capitalize(Locale("es"))} ${currentMonth.year}",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold
             )
 
-            OutlinedIconButton(
+            IconButton(
                 onClick = { currentMonth = currentMonth.plusMonths(1) },
-                modifier = Modifier.size(36.dp),
-                shape = RoundedCornerShape(8.dp)
+                modifier = Modifier.size(40.dp)
             ) { Icon(Icons.Filled.ChevronRight, contentDescription = "Mes siguiente") }
         }
 
@@ -281,35 +286,55 @@ fun CalendarContent(navController: NavController) {
             daysOfWeek.forEach { day ->
                 Text(
                     text = day,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(10.dp))
 
-        val rows = days.chunked(7)
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val totalWidth = this.maxWidth
-            val dayCellSize = (totalWidth / 7) - 6.dp
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                rows.forEach { row ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        row.forEach { day ->
-                            val date = day?.let { currentMonth.atDay(it) }
-                            val isToday = date == today
-                            DayCellAlternative(day, isToday, dayCellSize) {
-                                // Navega al registro emocional al tocar un día
-                                navController.navigate(Route.EmotionalRegistered.path)
-                            }
-                        }
+        CalendarGrid(currentMonth, today) { selectedDate ->
+            navController.navigate(Route.EmotionalRegistered.path)
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun CalendarGrid(
+    currentMonth: YearMonth,
+    today: LocalDate,
+    onDayClick: (LocalDate) -> Unit
+) {
+    val firstDayOfMonth = currentMonth.atDay(1)
+    val startDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
+    val daysInMonth = currentMonth.lengthOfMonth()
+    startDayOfWeek + daysInMonth
+
+    val daysList = (0 until 42).map { index ->
+        val dayNumber = index - startDayOfWeek + 1
+        if (dayNumber in 1..daysInMonth) currentMonth.atDay(dayNumber) else null
+    }
+
+    val rows = daysList.chunked(7)
+
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val totalWidth = this.maxWidth
+        val cellPadding = 8.dp
+        val dayCellSize = (totalWidth / 7) - (cellPadding * 2 / 7)
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            rows.forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    row.forEach { date ->
+                        DayCellAlternative(date, date == today, dayCellSize, onDayClick)
                     }
                 }
             }
@@ -317,26 +342,44 @@ fun CalendarContent(navController: NavController) {
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DayCellAlternative(day: Int?, isSelected: Boolean, size: Dp, onClick: (LocalDate) -> Unit) {
+fun DayCellAlternative(
+    date: LocalDate?,
+    isToday: Boolean,
+    size: Dp,
+    onClick: (LocalDate) -> Unit
+) {
+    val day = date?.dayOfMonth
+
+    val backgroundColor = when {
+        date == null -> Color.Transparent
+        isToday -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.surface
+    }
+
+    val contentColor = when {
+        date == null -> Color.Transparent
+        isToday -> MaterialTheme.colorScheme.onPrimary
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
     Box(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            .clickable(enabled = day != null) {
-                day?.let { onClick(LocalDate.now().withDayOfMonth(it)) }
+            .background(backgroundColor)
+            .clickable(enabled = date != null) {
+                date?.let { onClick(it) }
             },
         contentAlignment = Alignment.Center
     ) {
         if (day != null) {
             Text(
                 text = day.toString(),
-                color = if (isSelected)
-                    MaterialTheme.colorScheme.onPrimary
-                else
-                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f)
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = contentColor
             )
         }
     }
