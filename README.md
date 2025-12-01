@@ -2,29 +2,10 @@
 
 ## Esquema de la Organización del Proyecto
 
-Serena/
-├── app/
-│   ├── build.gradle
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── com/
-│   │   │   │       └── duocuc/
-│   │   │   │           └── serena/
-│   │   │   │               ├── MainActivity.kt  (Punto de entrada de la app)
-│   │   │   │               ├── Graph.kt         (Probable gestor de dependencias)
-│   │   │   │               ├── data/
-│   │   │   │               │   ├── model/       (Clases de datos como User, Product, etc.)
-│   │   │   │               │   └── repository/  (Repositorios para acceder a los datos)
-│   │   │   │               ├── navigation/
-│   │   │   │               │   └── AppNav.kt    (Configuración de la navegación de Compose)
-│   │   │   │               ├── ui/
-│   │   │   │               │   ├── theme/
-│   │   │   │               │   │   └── SerenaTheme.kt (Tema de la aplicación)
-│   │   │   │               │   └── view/ / screen/ (Pantallas de la UI como LoginScreen, HomeScreen, etc.)
-│   │   │   │               └── viewmodel/
-│   │   │   │                   └── (ViewModels para cada pantalla)
-│   │   │   └── AndroidManifest.xml
-│   └── ...
-└── ...
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/f1fc84af-291c-44b4-92ae-24a9cd5f9678" />
+
+
+
+
+
 
