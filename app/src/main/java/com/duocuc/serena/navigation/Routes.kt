@@ -1,5 +1,7 @@
 package com.duocuc.serena.navigation
 
+import java.time.LocalDate
+
 sealed class Route(val path: String) {
     object Load : Route("load")
     object Login : Route("login")
@@ -15,8 +17,7 @@ sealed class Route(val path: String) {
     object About : Route("about")
     object Logout : Route("logout")
 
-    object EmotionalRegistered : Route("emotional_registered")
+    object EmotionalRegistered : Route("emotional_registered/{date}") {
+        fun createRoute(date: LocalDate): String = "emotional_registered/$date"
+    }
 }
-
-
-

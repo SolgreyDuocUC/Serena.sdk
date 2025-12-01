@@ -44,6 +44,7 @@ import java.util.Locale
 @Composable
 fun EmotionalRegisteredScreen(
     navController: NavController, // Se añade NavController
+    date: LocalDate,
     viewModel: EmotionalRegisterViewModel = viewModel(factory = ViewModelFactory())
 ) {
     val registers by viewModel.registers.collectAsState()
@@ -52,16 +53,15 @@ fun EmotionalRegisteredScreen(
     var showDialog by remember { mutableStateOf(false) }
     var selectedRegister by remember { mutableStateOf<EmotionalRegisterData?>(null) }
 
-    // Filtramos los registros para mostrar solo los de hoy
-    val today = LocalDate.now()
-    val dailyRegisters = registers.filter { it.fecha.isEqual(today) }
+    // Filtramos los registros para mostrar solo los de la fecha seleccionada
+    val dailyRegisters = registers.filter { it.fecha.isEqual(date) }
 
     LaunchedEffect(Unit) { viewModel.loadRegisters() }
 
     Scaffold(
         bottomBar = { BottomNavBar(navController = navController) }, // Añadir BottomNavBar
         floatingActionButton = {
-            // Permitir agregar solo si no hay registro para hoy (o se está editando uno existente)
+            // Permitir agregar solo si no hay registro para el día seleccionado
             if (dailyRegisters.isEmpty() || selectedRegister != null) {
                 FloatingActionButton(
                     onClick = {
@@ -83,7 +83,7 @@ fun EmotionalRegisteredScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "Tu Diario de Hoy",
+                text = "Diario Emocional",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -94,7 +94,7 @@ fun EmotionalRegisteredScreen(
                 textAlign = TextAlign.Center
             )
             Text(
-                text = today.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                text = date.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
                 style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,7 +111,7 @@ fun EmotionalRegisteredScreen(
                 )
             }
 
-            // Mostrar sólo el registro del día
+            // Mostrar sólo el registro del día seleccionado
             if (dailyRegisters.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -119,7 +119,7 @@ fun EmotionalRegisteredScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Text(
-                            text = "Aún no has registrado emociones para hoy.",
+                            text = "Aún no has registrado emociones para este día.",
                             style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                             textAlign = TextAlign.Center
                         )
@@ -130,7 +130,7 @@ fun EmotionalRegisteredScreen(
                             },
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.defaultMinSize(minHeight = 48.dp)
-                        ) { Text("Agregar emoción de hoy") }
+                        ) { Text("Agregar emoción") }
                     }
                 }
             } else {
@@ -157,15 +157,16 @@ fun EmotionalRegisteredScreen(
         if (showDialog) {
             EmotionalDataDialog(
                 register = selectedRegister,
+                date = date,
                 onDismiss = { showDialog = false },
                 onSave = { emotionId, descriptionText ->
                     if (emotionId != null) {
-                        if (selectedRegister == null || !selectedRegister!!.fecha.isEqual(today)) {
-                            // Nuevo registro o registro en otro día (aunque la UI solo debería mostrar hoy)
-                            viewModel.registerEmotion(emotionId, descriptionText, today)
+                        if (selectedRegister == null) {
+                            // Nuevo registro con la fecha seleccionada
+                            viewModel.registerEmotion(emotionId, descriptionText, date)
                         } else {
-                            // Actualizar el registro existente de hoy
-                            viewModel.updateEmotion(selectedRegister!!.id, emotionId, descriptionText, today)
+                            // Actualizar el registro existente
+                            viewModel.updateEmotion(selectedRegister!!.id, emotionId, descriptionText, date)
                         }
                     }
                     showDialog = false
@@ -181,6 +182,7 @@ fun EmotionalRegisteredScreen(
 @Composable
 fun EmotionalDataDialog(
     register: EmotionalRegisterData?,
+    date: LocalDate,
     onDismiss: () -> Unit,
     onSave: (Int?, String) -> Unit
 ) {
@@ -195,7 +197,6 @@ fun EmotionalDataDialog(
 
     var selectedEmotionId by remember { mutableStateOf(register?.idEmocion) }
     var description by remember { mutableStateOf(register?.descripcion ?: "") }
-    val today = LocalDate.now()
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -207,7 +208,7 @@ fun EmotionalDataDialog(
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = today.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                        text = date.format(DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.CenterStart),
                         maxLines = 1,

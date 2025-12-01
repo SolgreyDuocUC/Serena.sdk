@@ -130,7 +130,7 @@ fun HomeAppScreen(
                         onClick = {
                             when (item.label) {
                                 "Configuración de usuario" -> nav.navigate(Route.Profile.path)
-                                "Ver registro emocional" -> nav.navigate(Route.EmotionalRegistered.path)
+                                "Ver registro emocional" -> nav.navigate(Route.EmotionalRegistered.createRoute(LocalDate.now()))
                                 "Leer mensaje del día" -> nav.navigate(Route.MessageOfDay.path)
                                 "Ruta de aprendizaje emocional" -> nav.navigate(Route.LearningPath.path)
                             }
@@ -307,7 +307,7 @@ fun CalendarContent(navController: NavController) {
         Spacer(Modifier.height(10.dp))
 
         CalendarGrid(currentMonth, today) { selectedDate ->
-            navController.navigate(Route.EmotionalRegistered.path)
+            navController.navigate(Route.EmotionalRegistered.createRoute(selectedDate))
         }
     }
 }

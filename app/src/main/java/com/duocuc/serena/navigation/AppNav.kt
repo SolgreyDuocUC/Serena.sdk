@@ -9,15 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.duocuc.serena.ui.screens.HomeAppScreen
 import com.duocuc.serena.ui.screens.auth.LoginScreen
 import com.duocuc.serena.ui.screens.auth.RegisterScreen
 import com.duocuc.serena.ui.screens.emotionData.EmotionalRegisteredScreen
 import com.duocuc.serena.ui.screens.learning.LearningPathScreen
 import com.duocuc.serena.ui.screens.profile.ProfileScreen
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -67,8 +70,13 @@ fun AppNav() {
         composable(Route.MessageOfDay.path) { /* Placeholder */ }
         composable(Route.LearningPath.path) { LearningPathScreen(navController = navController) }
 
-        composable(Route.EmotionalRegistered.path) {
-            EmotionalRegisteredScreen(navController = navController)
+        composable(
+            route = Route.EmotionalRegistered.path,
+            arguments = listOf(navArgument("date") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val dateStr = backStackEntry.arguments?.getString("date")
+            val date = dateStr?.let { LocalDate.parse(it) } ?: LocalDate.now()
+            EmotionalRegisteredScreen(navController = navController, date = date)
         }
 
         composable(Route.Profile.path) {
