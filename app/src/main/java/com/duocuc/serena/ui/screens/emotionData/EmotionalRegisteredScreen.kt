@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.duocuc.serena.data.dataModel.EmotionalRegisterData
+import com.duocuc.serena.data.modelData.EmotionalRegister
 import com.duocuc.serena.factory.ViewModelFactory
 import com.duocuc.serena.ui.screens.BottomNavBar
 import com.duocuc.serena.ui.theme.theme.*
@@ -52,9 +52,9 @@ fun EmotionalRegisteredScreen(
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("es", "ES"))
     var showDialog by remember { mutableStateOf(false) }
 
-    var selectedRegister by remember { mutableStateOf<EmotionalRegisterData?>(null) }
+    var selectedRegister by remember { mutableStateOf<EmotionalRegister?>(null) }
 
-    val dailyRegisters = registers.filter { it.fecha.isEqual(date) }
+    val dailyRegisters = registers.filter { LocalDate.parse(it.date).isEqual(date) }
 
     LaunchedEffect(Unit) { viewModel.loadRegisters() }
 
@@ -146,7 +146,7 @@ fun EmotionalRegisteredScreen(
                                 selectedRegister = register
                                 showDialog = true
                             },
-                            onDelete = { viewModel.deleteEmotion(register.id) }
+                            onDelete = { /* TODO: Implementar onDelete */ }
                         )
                     }
                     item { Spacer(modifier = Modifier.height(80.dp)) }
@@ -165,7 +165,7 @@ fun EmotionalRegisteredScreen(
                         if (selectedRegister == null) {
                             viewModel.registerEmotion(emotionId, descriptionText, date)
                         } else {
-                            viewModel.updateEmotion(selectedRegister!!.id, emotionId, descriptionText, date)
+                            // TODO: Implementar updateEmotion
                         }
                     }
                     showDialog = false
@@ -180,7 +180,7 @@ fun EmotionalRegisteredScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EmotionalDataDialog(
-    register: EmotionalRegisterData?,
+    register: EmotionalRegister?,
     date: LocalDate,
     isReadOnly: Boolean,
     onDismiss: () -> Unit,
@@ -195,8 +195,8 @@ fun EmotionalDataDialog(
         EmotionInfo(6, "Enojado", "😠", LightDestructive)
     )
 
-    var selectedEmotionId by remember { mutableStateOf(register?.idEmocion) }
-    var description by remember { mutableStateOf(register?.descripcion ?: "") }
+    var selectedEmotionId by remember { mutableStateOf(register?.emotion?.id?.toInt()) }
+    var description by remember { mutableStateOf(register?.description ?: "") }
 
     val canEdit = !isReadOnly
 
@@ -408,13 +408,13 @@ data class EmotionInfo(val id: Int, val label: String, val emoji: String, val co
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EmotionCard(
-    register: EmotionalRegisterData,
+    register: EmotionalRegister,
     formatter: DateTimeFormatter,
     onView: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val emotionInfo = when (register.idEmocion) {
+    val emotionInfo = when (register.emotion.id.toInt()) {
         1 -> Triple("Feliz 😊", "¡Qué bien! Un día lleno de alegría y satisfacción.", 1)
         2 -> Triple("Triste 😢", "Tómate un momento. Está bien sentirse así a veces.", 1)
         3 -> Triple("Neutral 😐", "Un día tranquilo. A veces, la calma es lo que se necesita.", 1)
@@ -458,7 +458,7 @@ fun EmotionCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = register.descripcion,
+                    text = register.description ?: "",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
@@ -467,7 +467,7 @@ fun EmotionCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = register.fecha.format(formatter),
+                    text = LocalDate.parse(register.date).format(formatter),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

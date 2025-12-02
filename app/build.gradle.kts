@@ -63,6 +63,14 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation("androidx.activity:activity-compose:1.9.3")
 
+// Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+// Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.material3)

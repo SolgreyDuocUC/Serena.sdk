@@ -1,25 +1,29 @@
 package com.duocuc.serena.repository
 
-import com.duocuc.serena.dao.RegistroEmocionalDao
-import com.duocuc.serena.data.dataModel.EmotionalRegisterData
+import com.duocuc.serena.data.modelData.EmotionalRegister
+import com.duocuc.serena.model.EmotionalRegisterCreateRequest
+import com.duocuc.serena.remote.ApiService
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.Result
 
-class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
+class EmotionalRegisterRepository(
+    private val apiService: ApiService
+) {
 
     // INSERT
-    suspend fun registerEmotion(idEmocion: Int, descripcion: String, fecha: LocalDate): Result<Boolean> {
+    suspend fun registerEmotion(idEmocion: Int, descripcion: String, fecha: LocalDate): Result<EmotionalRegister> {
         return withContext(Dispatchers.IO) {
             try {
-                val newRegister = EmotionalRegisterData(
-                    idEmocion = idEmocion,
-                    descripcion = descripcion,
-                    fecha = fecha
+                val request = EmotionalRegisterCreateRequest(
+                    emotionId = idEmocion.toLong(),
+                    userId = 1, // TODO: Reemplazar con el ID del usuario actual
+                    description = descripcion,
+                    date = fecha.toString()
                 )
-                dao.insertEmotion(newRegister)
-                Result.success(true)
+                val newRegister = apiService.createEmotionalRegister(request)
+                Result.success(newRegister)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -27,51 +31,15 @@ class EmotionalRegisterRepository(private val dao: RegistroEmocionalDao) {
     }
 
     // GET ALL
-    suspend fun getAllRegisters(): Result<List<EmotionalRegisterData>> {
+    suspend fun getAllRegisters(): Result<List<EmotionalRegister>> {
         return withContext(Dispatchers.IO) {
             try {
-                Result.success(dao.getAllRegisters())
+                Result.success(apiService.getEmotionalRegisters())
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
     }
 
-    // UPDATE
-    suspend fun updateEmotion(id: Int, newIdEmocion: Int, newDescripcion: String, newFecha: LocalDate): Result<Boolean> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val register = dao.getRegisterById(id)
-                    ?: return@withContext Result.failure(Exception("Registro no encontrado"))
-
-                dao.updateEmotion(
-                    register.copy(
-                        idEmocion = newIdEmocion,
-                        descripcion = newDescripcion,
-                        fecha = newFecha
-                    )
-                )
-
-                Result.success(true)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
-
-    // DELETE
-    suspend fun deleteEmotion(id: Int): Result<Boolean> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val register = dao.getRegisterById(id)
-                    ?: return@withContext Result.failure(Exception("Registro no encontrado"))
-
-                dao.deleteEmotion(register)
-
-                Result.success(true)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
+    // TODO: Implementar los métodos de actualizar y eliminar utilizando la API
 }
