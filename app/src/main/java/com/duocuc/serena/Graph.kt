@@ -13,7 +13,7 @@ object Graph {
 
     val apiService: ApiService by lazy { RetrofitInstance.api }
 
-    val userRepository by lazy { UserRepository(apiService) }
+    val userRepository by lazy { UserRepository(database.userDao(), database.userSessionDao()) }
     val emotionalRegisterRepository by lazy { EmotionalRegisterRepository(apiService) }
 
     fun provide(context: Context) {
