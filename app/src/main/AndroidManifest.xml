@@ -7,9 +7,8 @@
         android:required="false" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <meta-data
-        android:name="com.google.android.gms.client_id"
-        android:value="TU_CLIENT_ID.apps.googleusercontent.com" />
+    <!-- Permiso de Internet -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -19,7 +18,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo_serena_draw"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Serena">
+        android:theme="@style/Theme.Serena"
+        android:usesCleartextTraffic="true">
+
+        <meta-data
+            android:name="com.google.android.gms.client_id"
+            android:value="TU_CLIENT_ID.apps.googleusercontent.com" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,7 +32,6 @@
             android:theme="@style/Theme.Serena">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
