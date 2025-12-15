@@ -142,7 +142,7 @@ No se identificaron endpoints externos (de terceros) en la documentación del pr
 2. **Clonar el Repositorio**
 
    ```bash
-   git clone [COLOCAR ENLACE AL REPOSITORIO MÓVIL AQUÍ]
+   git clone https://github.com/SolgreyDuocUC/Serena.sdk
    ```
 
 3. **Abrir en Android Studio**
@@ -158,7 +158,7 @@ No se identificaron endpoints externos (de terceros) en la documentación del pr
 
 El código fuente de la aplicación móvil se encuentra disponible en el repositorio principal del proyecto:
 
-* Repositorio móvil: [COLOCAR ENLACE AL REPOSITORIO MÓVIL AQUÍ]
+* Repositorio móvil: https://github.com/SolgreyDuocUC/Serena.sdk
 
 ## Evidencia de Colaboración
 
@@ -166,4 +166,5 @@ El trabajo colaborativo se evidencia mediante el uso de control de versiones con
 
 * Diego Arias
 * Solgrey Medina
+
 
