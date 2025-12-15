@@ -6,21 +6,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.duocuc.serena.dao.RegistroEmocionalDao
-import com.duocuc.serena.dao.UserDAO
-import com.duocuc.serena.dao.UserSessionDao
-import com.duocuc.serena.data.dataModel.UserData
-import com.duocuc.serena.data.dataModel.UserActiveSession
 import com.duocuc.serena.data.dataModel.EmotionalRegisterData
 
 @Database(
-    entities = [UserData::class, UserActiveSession::class, EmotionalRegisterData::class],
+    entities = [EmotionalRegisterData::class],
     version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDAO
-    abstract fun userSessionDao(): UserSessionDao
     abstract fun registroEmocionalDao(): RegistroEmocionalDao
 
     companion object {

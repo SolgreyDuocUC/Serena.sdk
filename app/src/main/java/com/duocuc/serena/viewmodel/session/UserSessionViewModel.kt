@@ -2,6 +2,7 @@ package com.duocuc.serena.viewmodel.session
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duocuc.serena.Graph.authRepository
 import com.duocuc.serena.data.dataModel.UserData
 import com.duocuc.serena.repository.UserRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +19,7 @@ class UserSessionViewModel(private val userRepository: UserRepository) : ViewMod
 
     fun logout() {
         viewModelScope.launch {
-            userRepository.logout()
+            authRepository.logout()
         }
     }
 }

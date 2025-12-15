@@ -11,25 +11,39 @@ import com.duocuc.serena.viewmodel.profile.SessionViewModel
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory : ViewModelProvider.Factory {
+
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val sessionViewModel = SessionViewModel(Graph.userRepository)
+
+        val sessionViewModel =
+            SessionViewModel(
+                Graph.userRepository,
+                Graph.authRepository
+            )
 
         return when {
             modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
-                LoginViewModel(Graph.userRepository) as T
+                LoginViewModel(Graph.authRepository) as T
             }
+
             modelClass.isAssignableFrom(RegisterViewModel::class.java) -> {
-                RegisterViewModel(Graph.userRepository) as T
+                RegisterViewModel(Graph.authRepository) as T
             }
+
             modelClass.isAssignableFrom(SessionViewModel::class.java) -> {
                 sessionViewModel as T
             }
+
             modelClass.isAssignableFrom(EmotionalRegisterViewModel::class.java) -> {
                 EmotionalRegisterViewModel(Graph.emotionalRegisterRepository) as T
             }
+
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
-                ProfileViewModel(Graph.userRepository, sessionViewModel) as T
+                ProfileViewModel(
+                    Graph.userRepository,
+                    sessionViewModel
+                ) as T
             }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

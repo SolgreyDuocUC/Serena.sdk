@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 data class UserActiveSession(
 
     @PrimaryKey
-    val sessionId: Int = 1,
+    val sessionId: Long = 1,
 
     @ColumnInfo(name = "id_usuario_activo")
-    val activeUserId: Int
+    val activeUserId: Long
 )
